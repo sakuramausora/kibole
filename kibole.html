@@ -1,0 +1,230 @@
+﻿
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-120%); } }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes sway { 0%,100% { transform:rotate(-8deg); } 50% { transform:rotate(8deg); } }
+  .fade-in { animation: fadeIn 0.4s ease forwards; }
+  .scarf-anim { display:inline-block; animation: sway 1.8s infinite ease-in-out; font-size:20px; }
+  .btn-red { background:#ff0000; color:white; border:none; padding:10px 22px; border-radius:20px; font-size:14px; cursor:pointer; font-weight:500; text-decoration:none; display:inline-block; }
+  .btn-neutral { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.85); border:0.5px solid rgba(255,255,255,0.2); padding:10px 22px; border-radius:20px; font-size:14px; cursor:pointer; transition:background 0.2s; }
+  .btn-neutral:hover { background:rgba(255,255,255,0.18); }
+  .choice-card { background:rgba(255,255,255,0.07); border:0.5px solid rgba(255,255,255,0.15); border-radius:12px; padding:16px; cursor:pointer; transition:border-color 0.2s, transform 0.15s; margin-bottom:10px; }
+  .choice-card:hover { border-color:rgba(255,255,255,0.4); transform:translateY(-2px); }
+  .tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; }
+  .screen { display:none; }
+  #screen-hero { display:block; }
+  html, body, #app { background:#1a1a1a; outline:none; border:none; }
+  #app { color:rgba(255,255,255,0.85); font-family:var(--font-sans); overflow:hidden; }
+</style>
+
+<div id="app">
+
+  <div id="screen-hero" class="screen">
+    <div style="background:linear-gradient(135deg, #007eff 0%, #007eff 50%, #ff0000 50%, #ff0000 100%); padding:40px 16px 32px; text-align:center; position:relative; overflow:hidden;">
+      <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45);"></div>
+      <div style="position:relative;">
+        <div style="margin-bottom:12px;">
+          <span class="scarf-anim" style="margin-right:12px;">🧣</span>
+          <span style="color:rgba(255,255,255,0.6); font-size:12px; letter-spacing:2px; text-transform:uppercase;">Komedia · Romans · Boys Love</span>
+          <span class="scarf-anim" style="margin-left:12px; animation-delay:0.9s;">🧣</span>
+        </div>
+        <h1 style="color:white; font-size:1.8rem; font-weight:500; margin:0 0 6px; line-height:1.2;">Mój chłopak też<br>jest kibolem</h1>
+        <p style="color:rgba(255,255,255,0.75); font-size:13px; margin:0 0 4px;">sunflorence</p>
+        <div style="display:flex; justify-content:center; gap:8px; margin:12px 0 20px; flex-wrap:wrap;">
+          <span class="tag" style="background:rgba(255,255,255,0.15); color:white;">kibole</span>
+          <span class="tag" style="background:rgba(255,255,255,0.15); color:white;">chłopaki z osiedla</span>
+          <span class="tag" style="background:rgba(255,255,255,0.15); color:white;">Rzeszów</span>
+          <span class="tag" style="background:rgba(255,255,255,0.15); color:white;">ongoing</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.85); font-size:14px; max-width:420px; margin:0 auto 24px; line-height:1.6;">Ernest kibicuje Resovii. Louis Stali. Na derbach ich drogi skrzyżowały się po raz pierwszy — gdy Louis obił Ernestowi mordę...</p>
+        <button class="btn-neutral" onclick="showScreen('screen-choose')" style="background:white; color:#1a1a1a; border:none; font-weight:500;">Wejdź do historii ⚽</button>
+      </div>
+    </div>
+
+    <div style="background:#111; overflow:hidden; padding:7px 0;">
+      <div style="overflow:hidden; width:100%; background:black;">
+
+        <div class="scroll-text">
+          ⚽ STAL RZESZÓW · RESOVIA · LOJALNOŚĆ WOBEC BARW · ENEMIES TO LOVERS · NIESPODZIEWANE UCZUCIA
+        </div>
+
+      </div>
+
+      <style>
+        .scroll-text {
+          display: inline-block;
+          white-space: nowrap;
+          color: #ffd700;
+          font-size: 12px;
+          letter-spacing: 1px;
+
+          padding-left: 100%; /* 🔥 TO JEST KLUCZ */
+
+          animation: scroll 24s linear infinite;
+        }
+
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+      </style>
+    </div>
+
+    <div style="padding:24px 16px 0;">
+      <h2 style="text-align:center; font-size:16px; font-weight:500; color:rgba(255,255,255,0.9); margin:0 0 16px;">Poznaj bohaterów</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:560px; margin:0 auto;">
+        <div style="background:rgba(255,255,255,0.05); border:2px solid #ff0000; border-radius:12px; padding:16px; text-align:center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:#ff0000; display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 8px;">🧍</div>
+          <div style="font-weight:500; font-size:15px; color:rgba(255,255,255,0.9);">Ernest</div>
+          <div style="margin:6px 0;"><span class="tag" style="background:#ff0000; color:white;">Resovia</span></div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.55); line-height:1.5;">Dorastał z barwami czerwono-białymi. Ale czy nienawiść przechodzi z ojca na syna?</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); border:2px solid #007eff; border-radius:12px; padding:16px; text-align:center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:#007eff; display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 8px;">🧍</div>
+          <div style="font-weight:500; font-size:15px; color:rgba(255,255,255,0.9);">Louis</div>
+          <div style="margin:6px 0;"><span class="tag" style="background:#007eff; color:white;">Stal Rzeszów</span></div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.55); line-height:1.5;">Syn piłkarza Stali. W kibolstwie odnalazł sens życia. Ale czy tak pozostanie?</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:20px 16px 8px; text-align:center;">
+      <button class="btn-neutral" onclick="showScreen('screen-choose')" style="margin-right:8px; margin-bottom:8px;">Kim jesteś? Sprawdź!</button>
+      <button class="btn-neutral" onclick="showScreen('screen-scene')" style="margin-bottom:8px;">Przeczytaj scenę</button>
+      <br>
+      <a href="https://www.wattpad.com/story/356271838-m%C3%B3j-ch%C5%82opak-te%C5%BC-jest-kibolem" class="btn-red" style="margin-top:12px;">Czytaj na Wattpadzie</a>
+    </div>
+
+    <div style="padding:0 16px 24px; text-align:center;">
+      <div style="border-top:0.5px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:8px;">
+        <p style="font-size:12px; color:rgba(255,255,255,0.35); margin:0;">Strona oficjalna · <i>Mój chłopak też jest kibolem</i> autorstwa <strong style="color:rgba(255,255,255,0.55);">sunflorence</strong> na Wattpad</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-choose" class="screen" style="padding:24px 16px;">
+    <button onclick="showScreen('screen-hero')" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:13px; margin-bottom:16px; padding:0;">← wróć</button>
+    <h2 style="font-size:18px; font-weight:500; color:rgba(255,255,255,0.9); text-align:center; margin:0 0 6px;">Kim jesteś?</h2>
+    <p style="text-align:center; font-size:13px; color:rgba(255,255,255,0.5); margin:0 0 20px;">Odpowiedz szczerze, a odkryjesz swoje miejsce w historii.</p>
+    <div id="quiz-container"></div>
+  </div>
+
+  <div id="screen-scene" class="screen" style="padding:24px 16px;">
+    <button onclick="showScreen('screen-hero')" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:13px; margin-bottom:16px; padding:0;">← wróć</button>
+    <h2 style="font-size:18px; font-weight:500; color:rgba(255,255,255,0.9); text-align:center; margin:0 0 20px;">Derby. Spotkanie pierwsze.</h2>
+    <div style="background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.12); border-radius:12px; padding:20px; max-width:480px; margin:0 auto; line-height:1.8; font-size:14px; color:rgba(255,255,255,0.8);">
+      <p style="margin:0 0 14px; color:rgba(255,255,255,0.35); font-size:12px; text-transform:uppercase; letter-spacing:1px;">Fragment Prologu</p>
+      <p style="margin:0;">Podniósł się ostatkami sił, a potem sprawdził, czy ma komplet zębów. Podniósł wzrok i w pierwszej chwili został oślepiony przez słońce, a gdy odzyskał widoczność, ujrzał jego. Łajdaka, który śmiał go uderzyć. Na jego szyi powiewał niebiesko-biały szalik, włosy miał czarne jak smoła, a jego oczy zdradzały, że zapił się na ostatniej imprezie. Gdy tylko się upewnił, że Ernest przeżył spotkanie z jego pięścią, odwrócił się na pięcie i zniknął w tłumie.</p>
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <a href="https://www.wattpad.com/story/356271838-m%C3%B3j-ch%C5%82opak-te%C5%BC-jest-kibolem" class="btn-red">Czytaj dalej na Wattpadzie</a>
+    </div>
+  </div>
+
+  <div id="screen-result" class="screen" style="padding:24px 16px; text-align:center;">
+    <div id="result-content"></div>
+    <div style="margin-top:20px; display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
+      <button class="btn-neutral" onclick="showScreen('screen-choose')">Zagraj jeszcze raz</button>
+      <button class="btn-neutral" onclick="showScreen('screen-scene')">Przeczytaj scenę</button>
+    </div>
+    <div style="margin-top:16px;">
+      <a href="https://www.wattpad.com/story/356271838-m%C3%B3j-ch%C5%82opak-te%C5%BC-jest-kibolem" class="btn-red">Czytaj na Wattpadzie ⚽</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q: "Na derbowy mecz zakładasz:", answers: [
+    { text: "Szalik i kurtkę w barwach klubu. Nie ma innej opcji.", stal: 2, res: 0 },
+    { text: "Co popadnie. Ważne, żeby było wygodnie.", stal: 0, res: 0 },
+    { text: "Strój, który przypadkowo ma dobre kolory. Nieintencjonalnie.", stal: 0, res: 2 }
+  ]},
+  { q: "Ktoś mówi coś złego o twoim klubie. Reagujesz:", answers: [
+    { text: "Spokojnie tłumaczę, dlaczego się myli. Zimna krew.", stal: 2, res: 0 },
+    { text: "Wchodzę w polemikę, ale z humorem.", stal: 1, res: 1 },
+    { text: "Natychmiast, głośno i bez ogródek.", stal: 0, res: 2 }
+  ]},
+  { q: "Kiedy wpadasz na kogoś z wrogiego sektora, który jest przystojny...", answers: [
+    { text: "Ignoruję. Barwy mówią wszystko.", stal: 2, res: 0 },
+    { text: "Zauważam. Ale milczę.", stal: 1, res: 1 },
+    { text: "Zauważam. I nie mogę przestać zauważać.", stal: 0, res: 2 }
+  ]},
+  { q: "Twoja filozofia miłosna to:", answers: [
+    { text: "Lojalność ponad wszystko. Zawsze.", stal: 2, res: 0 },
+    { text: "Serce nie pyta o pozwolenie.", stal: 0, res: 2 },
+    { text: "Gdzieś pomiędzy. Jestem realistą/ką.", stal: 1, res: 1 }
+  ]}
+];
+
+let current = 0, stalScore = 0, resScore = 0;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  if (id === 'screen-choose') startQuiz();
+}
+
+function startQuiz() {
+  current = 0; stalScore = 0; resScore = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const container = document.getElementById('quiz-container');
+  if (current >= questions.length) { showResult(); return; }
+  const q = questions[current];
+  container.innerHTML = '';
+
+  const progress = document.createElement('div');
+  progress.style.cssText = 'display:flex; gap:6px; margin-bottom:20px; justify-content:center;';
+  for (let i = 0; i < questions.length; i++) {
+    const dot = document.createElement('div');
+    dot.style.cssText = `width:8px; height:8px; border-radius:50%; background:${i < current ? '#ff0000' : i === current ? '#007eff' : 'rgba(255,255,255,0.2)'};`;
+    progress.appendChild(dot);
+  }
+  container.appendChild(progress);
+
+  const qEl = document.createElement('p');
+  qEl.textContent = q.q;
+  qEl.style.cssText = 'font-weight:500; font-size:15px; text-align:center; margin:0 0 16px; color:rgba(255,255,255,0.9);';
+  container.appendChild(qEl);
+
+  q.answers.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'choice-card';
+    card.innerHTML = `<p style="margin:0; font-size:14px; color:rgba(255,255,255,0.8); line-height:1.5;">${a.text}</p>`;
+    card.onclick = () => { stalScore += a.stal||0; resScore += a.res||0; current++; renderQuestion(); };
+    container.appendChild(card);
+  });
+}
+
+function showResult() {
+  showScreen('screen-result');
+  const rc = document.getElementById('result-content');
+  let html = '';
+  if (stalScore > resScore) {
+    html = `<div style="width:64px;height:64px;border-radius:50%;background:#007eff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;">🧣</div>
+      <h2 style="font-size:18px;font-weight:500;color:rgba(255,255,255,0.9);margin:0 0 6px;">Jesteś Louisem!</h2>
+      <span class="tag" style="background:#007eff;color:white;margin-bottom:16px;display:inline-block;">Stal Rzeszów</span>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);max-width:380px;margin:0 auto;line-height:1.6;">Lojalny/a, spokojny/a, trzymasz się swoich barw. Ale gdzieś w środku wiesz, że serce nie zawsze gra w twoich kolorach.</p>`;
+  } else if (resScore > stalScore) {
+    html = `<div style="width:64px;height:64px;border-radius:50%;background:#ff0000;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;">🧣</div>
+      <h2 style="font-size:18px;font-weight:500;color:rgba(255,255,255,0.9);margin:0 0 6px;">Jesteś Ernestem!</h2>
+      <span class="tag" style="background:#ff0000;color:white;margin-bottom:16px;display:inline-block;">Resovia</span>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);max-width:380px;margin:0 auto;line-height:1.6;">Impulsywny/a, szczery/a, żyjesz pełną piersią. Kiedy coś czujesz — widać to z trybun.</p>`;
+  } else {
+    html = `<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#007eff 50%,#ff0000 50%);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;">⚽</div>
+      <h2 style="font-size:18px;font-weight:500;color:rgba(255,255,255,0.9);margin:0 0 6px;">Jesteś narratorem!</h2>
+      <span class="tag" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);margin-bottom:16px;display:inline-block;border:0.5px solid rgba(255,255,255,0.2);">Neutralny/a</span>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);max-width:380px;margin:0 auto;line-height:1.6;">Rozumiesz obie strony. Wiesz, że w miłości nie ma właściwych i niewłaściwych barw.</p>`;
+  }
+  rc.innerHTML = html;
+}
+</script>
