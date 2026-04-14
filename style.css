@@ -141,3 +141,23 @@ body, html {
 
 /* SCREEN: widoczność */
 .screen { display: none; }
+
+nav a {
+  color: #f5f5f5;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+nav a i {
+  margin-right: 8px;
+  color: #ff8fd8;
+}
+
+nav a:hover {
+  color: #ffffff;
+}
+
+nav a:hover i {
+  color: #ffd6f0;
+}
