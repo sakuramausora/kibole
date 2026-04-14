@@ -178,7 +178,3 @@ ul {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
-
-nav a:hover i {
-  color: #ffd6f0;
-}
