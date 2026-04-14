@@ -33,52 +33,6 @@ nav a:hover {
 nav a.active {
   border-bottom: 2px solid #ff8fd8;
 }
-/* NAWIGACJA */
-.navbar {
-    position: sticky; top: 0; z-index: 1000;
-    background: rgba(17, 17, 17, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex; justify-content: center; gap: 5px;
-    padding: 10px;
-}
-.nav-link {
-    color: rgba(255,255,255,0.5);
-    text-decoration: none;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-.nav-link.active { color: white; background: rgba(255,255,255,0.15); font-weight: 600; }
-.nav-link:hover { color: rgba(255,255,255,0.85); }
-
-/* ANIMACJE */
-@keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-120%); } }
-@keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-@keyframes screenEnter {
-    from { opacity: 0; transform: translateY(30px) scale(0.98); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes contentFade {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes sway { 0%,100% { transform:rotate(-8deg); } 50% { transform:rotate(8deg); } }
-
-.animate { animation: screenEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-.fade-in        { animation: fadeIn 0.4s ease forwards; }
-.scarf-anim     { display:inline-block; animation: sway 1.8s infinite ease-in-out; font-size:20px; }
-
-.stagger > * { opacity: 0; animation: contentFade 0.4s ease forwards; }
-.stagger > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger > *:nth-child(5) { animation-delay: 0.5s; }
 
 /* PRZYCISKI */
 .btn-red {
