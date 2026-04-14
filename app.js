@@ -142,4 +142,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         requestAnimationFrame(() => hero.classList.add('animate'));
     }
 });
+document.addEventListener("DOMContentLoaded", function() {
+    const currentPath = window.location.pathname.split("/").pop();
+    const navLinks = document.querySelectorAll("nav a");
 
+    navLinks.forEach(link => {
+        const linkPath = link.getAttribute("href");
+        if (currentPath === linkPath) {
+            link.classList.add("active");
+        }
+    });
+});
