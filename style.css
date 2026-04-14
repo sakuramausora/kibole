@@ -30,8 +30,8 @@ nav a {
 nav a:hover {
   color: #ff8fd8;
 }
-nav a.active {
-  border-bottom: 2px solid #ff8fd8 !important;
+nav a:active {
+  border-bottom: 2px solid #ff8fd8;
   color: #ff8fd8;
 }
 
