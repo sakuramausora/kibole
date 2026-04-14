@@ -32,6 +32,8 @@ nav a:hover {
 }
 nav a.active {
   border-bottom: 2px solid #ff8fd8;
+  display: inline-block;
+  padding-bottom: 3px;
 }
 
 /* PRZYCISKI */
