@@ -142,3 +142,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         requestAnimationFrame(() => hero.classList.add('animate'));
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll("nav a");
+  let currentPage = window.location.pathname.split("/").pop();
+
+  if (currentPage === "" || currentPage === "/") {
+    currentPage = "index.html";
+  }
+
+  links.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (href === currentPage) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+  });
+});
