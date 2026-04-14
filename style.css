@@ -30,7 +30,7 @@ nav a {
 nav a:hover {
   color: #ff8fd8;
 }
-ul#Navigation .active {
+nav a:current {
   border-bottom: 2px solid #ff8fd8;
   color: #ff8fd8;
 }
