@@ -132,12 +132,15 @@ async function showResult() {
 }
 
 const links = document.querySelectorAll("nav a");
-const currentPath = window.location.pathname.replace(/\/$/, "");
+const currentPage = window.location.pathname.split("/").pop();
 
 links.forEach(link => {
-  const linkPath = link.getAttribute("href").replace(/\/$/, "");
+  const linkPage = link.getAttribute("href");
 
-  if (linkPath === currentPath) {
+  // pomijamy linki zewnętrzne (np. Facebook, Wattpad)
+  if (linkPage.startsWith("http")) return;
+
+  if (linkPage === currentPage) {
     link.classList.add("active");
   }
 });
