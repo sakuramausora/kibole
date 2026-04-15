@@ -131,22 +131,6 @@ async function showResult() {
     `;
 }
 
-const links = document.querySelectorAll("nav a");
-const currentPage = window.location.pathname.split("/").pop();
-
-links.forEach(link => {
-  const linkPage = link.getAttribute("href");
-
-  // pomijamy linki zewnętrzne (np. Facebook, Wattpad)
-  if (linkPage.startsWith("http")) return;
-
-   if (
-  linkPage === currentPage ||
-  (currentPage === "" && linkPage === "index.html")
-) {
-  link.classList.add("active");
-}
-});
 
 
 // ── Init ───────────────────────────────────────────────
@@ -161,12 +145,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 document.addEventListener("DOMContentLoaded", function() {
-    const currentPath = window.location.pathname.split("/").pop();
+    const currentPath = window.location.pathname.split("/").pop() || "index.html";
     const navLinks = document.querySelectorAll("nav a");
 
     navLinks.forEach(link => {
         const linkPath = link.getAttribute("href");
-        if (currentPath === linkPath) {
+
+        // pomijamy linki zewnętrzne
+        if (linkPath.startsWith("http")) return;
+
+        if (linkPath === currentPath) {
             link.classList.add("active");
         }
     });
