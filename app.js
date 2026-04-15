@@ -140,10 +140,14 @@ links.forEach(link => {
   // pomijamy linki zewnętrzne (np. Facebook, Wattpad)
   if (linkPage.startsWith("http")) return;
 
-  if (linkPage === currentPage) {
-    link.classList.add("active");
-  }
+   if (
+  linkPage === currentPage ||
+  (currentPage === "" && linkPage === "index.html")
+) {
+  link.classList.add("active");
+}
 });
+
 
 // ── Init ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
