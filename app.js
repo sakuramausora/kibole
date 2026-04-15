@@ -131,6 +131,17 @@ async function showResult() {
     `;
 }
 
+const links = document.querySelectorAll("nav a");
+const currentPath = window.location.pathname.replace(/\/$/, "");
+
+links.forEach(link => {
+  const linkPath = link.getAttribute("href").replace(/\/$/, "");
+
+  if (linkPath === currentPath) {
+    link.classList.add("active");
+  }
+});
+
 // ── Init ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
     // Preload ekranu startowego
