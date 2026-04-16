@@ -197,16 +197,17 @@ ul {
   transform: scale(1.05);
 }
 
+/* OBRAZEK KWADRATOWY I NIEUCIĘTY */
 .tile img {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
+  aspect-ratio: 1 / 1;   /* wymusza kwadrat */
+  object-fit: contain;   /* pokazuje cały obraz */
+  background: #000;      /* opcjonalne tło (gdy są puste przestrzenie) */
 }
 
+/* USUNIĘCIE TYTUŁU */
 .tile-title {
-  padding: 12px;
-  text-align: center;
-  font-weight: 600;
+  display: none;
 }
 
 /* MODAL */
