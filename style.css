@@ -220,6 +220,7 @@ ul {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.7);
+    overflow-y: auto;
 }
 
 /* OKNO MODALA */
@@ -232,7 +233,6 @@ ul {
   width: 85%;
   max-width: 600px;
   border-radius: 16px;
-overflow-y: auto;
 }
 
 /* ❗ NAPRAWA X */
