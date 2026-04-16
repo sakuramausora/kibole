@@ -214,8 +214,8 @@ function openRecipe(recipeId) {
     </div>
 
   </div>;
-`
-  if (recipeId === "recipe2") {
+`;
+  } else if (recipeId === "recipe2") {
     content = `
     <main class="recipes">
   <div class="recipe-card">
@@ -288,21 +288,19 @@ Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był 
       <li>Jeśli sos jest za gęsty — dodaj wodę z makaronu lub mleko</li>
       <li>Jeśli za rzadki — dodaj więcej parmezanu</li>
     </ul>
-  </div>;
-`}
+  </div>
+
+</div>;
+`;
+  }
 
   details.innerHTML = content;
   modal.style.display = "block";
 }
-
 function closeRecipe() {
-  document.getElementById("recipeModal").style.display = "none";
-}
-
-/* zamykanie po kliknięciu poza modal */
-window.onclick = function (event) {
   const modal = document.getElementById("recipeModal");
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
-};
+  const details = document.getElementById("recipeDetails");
+
+  if (modal) modal.style.display = "none";
+  if (details) details.innerHTML = "";
+}
