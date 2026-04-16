@@ -223,11 +223,13 @@ function openRecipe(recipeId) {
     <h2>Makaron Louisiana</h2>
 
     <p class="story">
-Wyjął makaron z szafki, a następnie energicznie podbiegł do lodówki, aby wyciągnąć z niej ser i śmietankę. Na końcu sięgnął po uwielbiane w tym domu krewetki. 
--Co to będzie? -zapytał zaintrygowany Ernest. 
--Chyba makaron z krewetkami. Coś takiego. -niezbyt pewnie nazwał to danie, ale gdy zaczął je przyrządzać, nie wydawał się być całkowitym amatorem w kuchni. 
--Co zazwyczaj robiłeś w urodziny? -Ernest chciał skorzystać z okazji i wybadać grunt. 
-Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był gotów się odezwać. -Urodziny? -zaśmiał się. -Chlałem piwo pod Żabką, a co?
+Wyjął makaron z szafki, a następnie energicznie podbiegł do lodówki, aby wyciągnąć z niej ser i śmietankę.<br>
+Na końcu sięgnął po uwielbiane w tym domu krewetki.<br>
+-Co to będzie? -zapytał zaintrygowany Ernest.<br>
+-Chyba makaron z krewetkami. Coś takiego. -niezbyt pewnie nazwał to danie, ale gdy zaczął je przyrządzać, nie wydawał się być całkowitym amatorem w kuchni.<br>
+-Co zazwyczaj robiłeś w urodziny? -Ernest chciał skorzystać z okazji i wybadać grunt.<br>
+Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był gotów się odezwać.<br>
+-Urodziny? -zaśmiał się. -Chlałem piwo pod Żabką, a co?
     </p>
 
       <div class="block">
