@@ -176,12 +176,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstLink = document.querySelector('.nav-link');
     if (firstLink) firstLink.classList.add('active');
 });
-const recipes = {
-  recipe1: `
-<main class="recipes">
 
+function openRecipe(recipeId) {
+  const modal = document.getElementById("recipeModal");
+  const details = document.getElementById("recipeDetails");
 
+  let content = "";
 
+  if (recipeId === "recipe1") {
+    content = `
   <div class="recipe-card">
 
     <h2>🥗 Sałatka z jogurtem greckim à la wujek Marek</h2>
@@ -210,15 +213,11 @@ const recipes = {
       </p>
     </div>
 
-  </div>
-
-</main>
+  </div>;
 `
-,
-  recipe2: `<main class="recipes">
-
-
-
+  if (recipeId === "recipe2") {
+    content = `
+    <main class="recipes">
   <div class="recipe-card">
 
     <h2>Makaron Louisiana</h2>
@@ -289,5 +288,21 @@ Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był 
       <li>Jeśli sos jest za gęsty — dodaj wodę z makaronu lub mleko</li>
       <li>Jeśli za rzadki — dodaj więcej parmezanu</li>
     </ul>
-  </div>
+  </div>;
 `}
+
+  details.innerHTML = content;
+  modal.style.display = "block";
+}
+
+function closeRecipe() {
+  document.getElementById("recipeModal").style.display = "none";
+}
+
+/* zamykanie po kliknięciu poza modal */
+window.onclick = function (event) {
+  const modal = document.getElementById("recipeModal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+};
