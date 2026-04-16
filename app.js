@@ -213,7 +213,7 @@ function openRecipe(recipeId) {
       </p>
     </div>
 
-  </div>;
+  </div>
 `;
   } else if (recipeId === "recipe2") {
     content = `
@@ -292,7 +292,7 @@ Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był 
     </ul>
   </div>
 
-</div>;
+</div>
 `;
   }
 
