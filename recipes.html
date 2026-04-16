@@ -13,44 +13,32 @@ fetch("nav.html")
     document.getElementById("nav").innerHTML = data;
   });
 </script>
+
 <main class="recipes">
 
-  <h1 class="title">
-    Przenieś się do kulinarnego świata "Kiboli"!
-  </h1>
+  <h1 class="title">Przenieś się do kulinarnego świata "Kiboli"!</h1>
+  <p class="subtitle">Kuchnia inspirowana trybunami. Minimum składników, maksimum emocji.</p>
 
-  <p class="subtitle">
-    Kuchnia inspirowana trybunami. Minimum składników, maksimum emocji.
-  </p>
+  <div class="grid">
 
-  <div class="recipe-card">
-
-    <h2>🥗 Sałatka z jogurtem greckim à la wujek Marek</h2>
-
-    <p class="story">
-      Wyrafinowana kompozycja inspirowana klasyczną kuchnią Europy Środkowo-Wschodniej,
-      w której tradycja spotyka się z nowoczesnym podejściem do tekstury i lekkości.
-      To danie redefiniuje pojęcie świeżości — chłodne, kremowe, a jednocześnie zadziorne.
-    </p>
-
-    <div class="block">
-      <h3>🧾 Składniki</h3>
-      <ul>
-        <li>2 ogórki</li>
-        <li>3–4 łyżki jogurtu greckiego</li>
-        <li>ząbek czosnku</li>
-        <li>sól, pieprz</li>
-      </ul>
+    <div class="tile" onclick="openRecipe('recipe1')">
+      <img src="sałatka.jpeg" alt="Sałatka">
+      <div class="tile-title">Sałatka wujka Marka</div>
     </div>
 
-    <div class="block">
-      <h3>👩‍🍳 Przygotowanie</h3>
-      <p>
-        Ogórki kroimy w cienkie plastry, mieszamy z jogurtem,
-        dodajemy przeciśnięty czosnek, doprawiamy do smaku.
-      </p>
+    <div class="tile" onclick="openRecipe('recipe2')">
+      <img src="louisiana.jpeg" alt="Louisiana">
+      <div class="tile-title">Makaron Louisiana</div>
     </div>
 
   </div>
 
 </main>
+
+<!-- MODAL -->
+<div id="recipeModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeRecipe()">&times;</span>
+    <div id="recipeDetails"></div>
+  </div>
+</div>
