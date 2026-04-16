@@ -176,3 +176,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstLink = document.querySelector('.nav-link');
     if (firstLink) firstLink.classList.add('active');
 });
+const recipes = {
+  recipe1: `
+<main class="recipes">
+
+
+
+  <div class="recipe-card">
+
+    <h2>🥗 Sałatka z jogurtem greckim à la wujek Marek</h2>
+
+    <p class="story">
+      Wyrafinowana kompozycja inspirowana klasyczną kuchnią Europy Środkowo-Wschodniej,
+      w której tradycja spotyka się z nowoczesnym podejściem do tekstury i lekkości.
+      To danie redefiniuje pojęcie świeżości — chłodne, kremowe, a jednocześnie zadziorne.
+    </p>
+
+    <div class="block">
+      <h3>🧾 Składniki</h3>
+      <ul>
+        <li>2 ogórki</li>
+        <li>3–4 łyżki jogurtu greckiego</li>
+        <li>ząbek czosnku</li>
+        <li>sól, pieprz</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h3>👩‍🍳 Przygotowanie</h3>
+      <p>
+        Ogórki kroimy w cienkie plastry, mieszamy z jogurtem,
+        dodajemy przeciśnięty czosnek, doprawiamy do smaku.
+      </p>
+    </div>
+
+  </div>
+
+</main>
+`
+,
+  recipe2: `<main class="recipes">
+
+
+
+  <div class="recipe-card">
+
+    <h2>Makaron Louisiana</h2>
+
+    <p class="story">
+
+    </p>
+
+    <div class="block">
+      <h3>🧾 Składniki</h3>
+      <ul>
+        <li>2 ogórki</li>
+        <li>3–4 łyżki jogurtu greckiego</li>
+        <li>ząbek czosnku</li>
+        <li>sól, pieprz</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h3>👩‍🍳 Przygotowanie</h3>
+      <p>
+        Ogórki kroimy w cienkie plastry, mieszamy z jogurtem,
+        dodajemy przeciśnięty czosnek, doprawiamy do smaku.
+      </p>
+    </div>
+
+  </div>
+
+</main>`
+};
