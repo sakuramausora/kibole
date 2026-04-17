@@ -68,7 +68,7 @@ nav a.active {
 }
 
 /* POSTACIE */
-.char-section { max-width: 500px; margin: 0 auto; padding: 80px 16px; }
+.char-section { max-width: 500px; margin: 0 auto; padding: 100px 16px; }
 
 .char-pair-row {
     display: flex; justify-content: space-around;
