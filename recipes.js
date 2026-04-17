@@ -125,7 +125,7 @@ function openRecipe(recipeId) {
   modal.style.display = "block";
  document.body.classList.add("modal-open");
 }
-
+window.openRecipe = openRecipe;
 
 function closeRecipe() {
   const modal = document.getElementById("recipeModal");
