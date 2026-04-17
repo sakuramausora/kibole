@@ -240,7 +240,7 @@ ul {
 
 /* KARTY GŁÓWNYCH BOHATERÓW */
 .hero-card {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,1);
   border-radius: 12px;
   padding: 16px;
   text-align: center;
@@ -248,7 +248,7 @@ ul {
   cursor: default;
 }
 .hero-card:hover {
-  transform: scale(1.25);
+  transform: scale(1.75);
   box-shadow: 0 0 25px rgba(255,255,255,0.5);
 }
 .hero-avatar {
