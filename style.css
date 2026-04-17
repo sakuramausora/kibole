@@ -57,15 +57,6 @@ nav a.active {
     font-size: 11px; font-weight: 500;
 }
 
-/* KARTY WYBORU (quiz) */
-.choice-card {
-    background: rgba(255,255,255,0.07);
-    border: 0.5px solid rgba(255,255,255,0.15);
-    border-radius: 12px; padding: 16px;
-    cursor: pointer; transition: 0.2s; margin-bottom: 10px;
-}
-.choice-card:hover { border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
-
 /* TICKER */
 .scroll-text {
     display: inline-block; white-space: nowrap;
