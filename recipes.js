@@ -125,13 +125,11 @@ function openRecipe(recipeId) {
   modal.style.display = "block";
 }
 
+
 function closeRecipe() {
   const modal = document.getElementById("recipeModal");
   const details = document.getElementById("recipeDetails");
 
   modal.style.display = "none";
   details.innerHTML = "";
-}
-  if (modal) modal.style.display = "none";
-  if (details) details.innerHTML = "";
 }
