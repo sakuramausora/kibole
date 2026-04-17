@@ -123,6 +123,7 @@ function openRecipe(recipeId) {
 
   details.innerHTML = content;
   modal.style.display = "block";
+ document.body.classList.add("modal-open");
 }
 
 
@@ -132,4 +133,5 @@ function closeRecipe() {
 
   modal.style.display = "none";
   details.innerHTML = "";
+ document.body.classList.remove("modal-open");
 }
