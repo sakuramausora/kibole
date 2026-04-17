@@ -176,9 +176,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstLink = document.querySelector('.nav-link');
     if (firstLink) firstLink.classList.add('active');
 });
-
-
-
-  if (modal) modal.style.display = "none";
-  if (details) details.innerHTML = "";
-}
