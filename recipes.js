@@ -135,3 +135,4 @@ function closeRecipe() {
   details.innerHTML = "";
  document.body.classList.remove("modal-open");
 }
+window.closeRecipe = closeRecipe;
