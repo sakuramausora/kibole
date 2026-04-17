@@ -17,9 +17,9 @@ nav {
 }
 nav ul {
   list-style: none;
-  display: flex;              /* 🔥 to robi poziom */
-  justify-content: center;    /* wyśrodkowanie */
-  gap: 20px;                  /* odstępy */
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   padding: 0;
   margin: 0;
 }
@@ -194,9 +194,9 @@ ul {
 /* OBRAZEK KWADRATOWY I NIEUCIĘTY */
 .tile img {
   width: 100%;
-  aspect-ratio: 1 / 1;   /* wymusza kwadrat */
-  object-fit: contain;   /* pokazuje cały obraz */
-  background: #000;      /* opcjonalne tło (gdy są puste przestrzenie) */
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: #000;
 }
 
 /* USUNIĘCIE TYTUŁU */
@@ -236,4 +236,45 @@ ul {
   right: 15px;
   font-size: 28px;
   cursor: pointer;
+}
+
+/* KARTY GŁÓWNYCH BOHATERÓW */
+.hero-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+}
+.hero-card:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+.hero-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 10px;
+  border: 3px solid transparent;
+}
+.hero-name {
+  font-weight: 500;
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+.hero-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.hero-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
 }
