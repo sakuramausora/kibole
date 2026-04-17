@@ -132,3 +132,6 @@ function closeRecipe() {
   modal.style.display = "none";
   details.innerHTML = "";
 }
+  if (modal) modal.style.display = "none";
+  if (details) details.innerHTML = "";
+}
