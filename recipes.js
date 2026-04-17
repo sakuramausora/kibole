@@ -1,6 +1,6 @@
 const recipes = {
-  recipe1: `
-  <div class="recipe-card">
+/*  recipe1: `
+ <div class="recipe-card">
 
     <h2>🥗 Sałatka z jogurtem greckim à la wujek Marek</h2>
 
@@ -30,6 +30,7 @@ const recipes = {
 
   </div>
   `,
+  */
 
   recipe2: `
   <div class="recipe-card">
