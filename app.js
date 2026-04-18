@@ -99,3 +99,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstLink = document.querySelector('.nav-link');
     if (firstLink) firstLink.classList.add('active');
 });
+
+// ── Auto-scroll przy tooltipie postaci ─────────────────
+document.addEventListener('mouseover', (e) => {
+    const circle = e.target.closest('.char-circle');
+    const heroCard = e.target.closest('.hero-card');
+    const target = circle || heroCard;
+    if (!target) return;
+
+    // tooltip tylko dla char-circle
+    const tooltip = circle?.querySelector('.char-tooltip');
+
+    setTimeout(() => {
+        const rect = (tooltip ?? target).getBoundingClientRect();
+        const overflowBottom = rect.bottom - window.innerHeight;
+
+        if (overflowBottom > 0) {
+            window.scrollBy({
+                top: overflowBottom + 20,
+                behavior: 'smooth'
+            });
+        }
+    }, 150);
+});

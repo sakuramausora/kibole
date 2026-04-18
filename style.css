@@ -71,20 +71,32 @@ nav a.active {
 .char-section {
     max-width: 650px;
     margin: 0 auto;
-    padding: 60px 16px; /* było 120px → mocno zmniejszamy */
+    padding: 60px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 200px; /* odstęp między rzędami */
 }
 
+/* Każdy rząd */
 .char-pair-row {
     display: flex;
-    justify-content: space-between; /* zamiast space-around */
+    justify-content: center; /* równe odstępy */
     align-items: center;
-    margin-bottom: 45px; /* było 80px */
+    gap: 300px; /* równe odstępy między kółkami */
     position: relative;
-    padding: 0 20px; /* lekko odsuwamy od środka */
 }
+
+/* Przesunięcie rzędów nieparzystych */
+.char-pair-row:nth-child(odd) {
+    transform: translateX(200px);
 }
-.char-pair-row:nth-child(even) { padding-left: 60px; }
-.char-pair-row:nth-child(odd)  { padding-right: 60px; }
+
+/* Opcjonalnie: delikatne cofnięcie parzystych */
+.char-pair-row:nth-child(even) {
+    transform: translateX(-200px);
+}
+
+
 .char-pair-row::before {
     content: "";
     position: absolute; top: 50%; left: 20%; right: 20%;
@@ -100,9 +112,9 @@ nav a.active {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     background: #222 linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3));
     display: flex; align-items: center; justify-content: center;
-    z-index: 2;
+    z-index: 1;
 }
-.char-circle:hover { transform: scale(2); z-index: 100; }
+.char-circle:hover { transform: scale(2); z-index: 10; }
 
 .border-resovia { border-color: #ff0000; }
 .char-circle.border-resovia:hover { box-shadow: 0 0 25px rgba(255,0,0,0.5); }
@@ -113,6 +125,7 @@ nav a.active {
 .border-karpaty { border-color: #26146e; }
 .char-circle.border-karpaty:hover { box-shadow: 0 0 25px rgba(38, 20, 110,0.5); }
 
+/* NOWE */
 .char-tooltip {
     visibility: hidden; width: 160px;
     background: rgba(10,10,10,0.98); color: #fff;
@@ -121,9 +134,14 @@ nav a.active {
     transform: translate(-50%, 100%);
     opacity: 0; transition: all 0.3s ease;
     font-size: 8px; border: 1px solid rgba(255,255,255,0.15);
-    pointer-events: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    pointer-events: auto;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    padding-top: 18px;
+    margin: 0px;
+    z-index: 9999;
 }
-.char-circle:hover .char-tooltip { visibility: visible; opacity: 1; bottom: -5px; }
+.char-circle:hover .char-tooltip,
+.char-tooltip:hover { visibility: visible; opacity: 1; bottom: -5px; }
 
 /* SCREEN: widoczność */
 .screen { display: none; }
