@@ -100,6 +100,10 @@ nav a.active {
 .char-circle.border-resovia:hover { box-shadow: 0 0 25px rgba(255,0,0,0.5); }
 .border-stal { border-color: #007eff; }
 .char-circle.border-stal:hover   { box-shadow: 0 0 25px rgba(0,126,255,0.5); }
+.border-sanok { border-color: #f0ec13; }
+.char-circle.border-sanok:hover { box-shadow: 0 0 25px rgba(255,102,0,0.5); }
+.border-karpaty { border-color: #26146e; }
+.char-circle.border-karpaty:hover { box-shadow: 0 0 25px rgba(0,128,0,0.5); }
 
 .char-tooltip {
     visibility: hidden; width: 160px;
