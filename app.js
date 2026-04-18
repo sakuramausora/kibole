@@ -43,11 +43,16 @@ async function showScreen(id, navEl) {
     target.style.display = 'block';
     requestAnimationFrame(() => target.classList.add('animate'));
 
-    // Akcje specjalne
-    if (id === 'choose') startQuiz();
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+// poczekaj aż layout się wyrenderuje
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        initCharRowScroll();
+    });
+});
 }
+
 
 // Ładowanie HTML do kontenera
 async function loadScreen(id) {
