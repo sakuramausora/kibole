@@ -88,12 +88,12 @@ nav a.active {
 
 /* Przesunięcie rzędów nieparzystych */
 .char-pair-row:nth-child(odd) {
-    transform: translateX(200px);
+    transform: translateX(130px);
 }
 
 /* Opcjonalnie: delikatne cofnięcie parzystych */
 .char-pair-row:nth-child(even) {
-    transform: translateX(-200px);
+    transform: translateX(-130px);
 }
 
 
@@ -114,7 +114,7 @@ nav a.active {
     display: flex; align-items: center; justify-content: center;
     z-index: 1;
 }
-.char-circle:hover { transform: scale(2); z-index: 10; }
+.char-circle:hover { transform: scale(1.9); z-index: 10; }
 
 .border-resovia { border-color: #ff0000; }
 .char-circle.border-resovia:hover { box-shadow: 0 0 25px rgba(255,0,0,0.5); }
