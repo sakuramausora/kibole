@@ -127,7 +127,7 @@ nav a.active {
   margin: auto;
 }
 
-.title {
+.tile-title{
   font-size: 28px;
   text-align: center;
   margin-bottom: 10px;
@@ -149,6 +149,7 @@ nav a.active {
 .recipe-card h2 {
   margin-top: 0;
   color: #ff8fd8;
+    text-align: center;
 }
 
 .story {
@@ -167,6 +168,10 @@ nav a.active {
 .block h3 {
   margin-top: 0;
   color: #ffffff;
+}
+
+.block p {
+  margin-bottom: 1em;
 }
 
 ul {

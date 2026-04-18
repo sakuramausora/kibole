@@ -32,7 +32,7 @@ const recipes = {
   `,
   */
 
-  recipe2: `
+    recipe2: `
   <div class="recipe-card">
 
     <h2>Makaron Louisiana</h2>
@@ -105,6 +105,60 @@ Louis w skupieniu podrzucał krewetki na patelni i dopiero jak skończył, był 
         <li>Jeśli sos jest za gęsty — dodaj wodę z makaronu lub mleko</li>
         <li>Jeśli za rzadki — dodaj więcej parmezanu</li>
       </ul>
+    </div>
+
+  </div>
+  `,
+
+  recipe3: `
+  <div class="recipe-card">
+
+    <h2>Torte d'Andrutte</h2>
+
+    <p class="story">
+-A teraz coś specjalnego. -kontynuował dumny z siebie wujek, w ogóle nie zauważając, że chyba tylko on jest tak zachwycony tym, co przywiózł. -Jurek, niepotrzebnie robiłeś tort.<br>
+Jerzy spojrzał na brata zupełnie nieprzekonany do tego pomysłu. <br>
+Marek tymczasem z namaszczeniem zdjął folię z okrągłego pakunku, który wcześniej leżał na stole.<br>
+-Torte d'andrutte. -obwieścił uroczyście. <br>
+Zapadła krótka cisza. Jeremi spojrzał najpierw na "torte d'andrutte", potem na Gabriela, jakby upewniał się, że to nie jest jakiś rodzinny żart, którego jeszcze nie rozumie.<br>
+Na stole wylądowało kilka równych wafli wyciętych w kółka, przełożonych grubą warstwą masy kajmakowej, lekko wypływającej bokami. Na wierzchu widniały dwie połówki orzecha włoskiego, najwyraźniej w charakterze dekoracji.<br>
+-Własnoręcznie robiony -podkreślił Marek z dumą. -Receptura inspirowana południem Francji.<br>
+Jerzy odchrząknął.<br>
+-Marku...to jest andrut?<br>
+-Nie, nie, nie. -Marek uniósł palec. -To jest torte d'andrutte. Tradycyjny deser warstwowy.<br>
+Torte d'andrutte różnił się od zwykłego andruta właściwie tylko tym, że miał okrągły kształt i został ułożony tak, żeby przypominać tort. Najpewniej właśnie to wystarczyło, żeby wujek nadał mu tak dumną nazwę. Nikt jednak już tego nie komentował.
+    </p>
+
+    <div class="block">
+      <h3>🧾 Składniki</h3>
+      <ul>
+        <li>1 opakowanie okrągłego andruta</li>
+        <li>1 puszka masy kajmakowej</li>
+        <li>1 słoik Confiture Bonne Maman Framboise albo podobnej</li>
+        <li>1 orzech włoski do dekoracji</li>
+        <li>wódka, żeby lepiej wchodziło (opcjonalnie)</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h3>👩‍🍳 Przygotowanie</h3>
+      <p>
+        Wafel posmarować z kajmakiem, a następnie na wierzchu warstwy kajmakowej rozprowadzić konfiturę. 
+        </p>
+        <p>
+        Posmarować kolejny wafel kajmakiem, a następnie ułożyć go na poprzednim kajmakiem do dołu, tak, aby konfitura znalazła się między warstwami kajmaku. Dzięki temu wafel nią nie namoknie.
+        </p>
+        <p>
+        Powtarzać do skończenia się wafli lub pozostałych składników. 
+      </p>       
+       <p>
+        Na górze ułożyć orzecha włoskiego przeciętego na pół (można przykleić go na kajmaku, jeśli jeszcze został).
+      </p>
+
+      <h3>💡 Propozycja podania</h3>
+
+        Można podać z wódką do popicia.
+
     </div>
 
   </div>
