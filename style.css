@@ -391,9 +391,10 @@ ul {
     /* HERO GRID — dwie kolumny obok siebie, mniejsze karty */
 .hero-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    column-gap: 48px;   /* więcej miejsca między kartami */
-    padding: 8px;
+    row-gap: 16px;
+    column-gap: 32px;
+    padding: 20px 0;   /* tylko góra/dół, bez lewej/prawej */
+    max-width: 100%;
 }
 
 .hero-grid .pair-divider {
