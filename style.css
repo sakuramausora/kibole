@@ -92,7 +92,7 @@ nav a.active {
 .char-section {
     max-width: 650px;
     margin: 0 auto;
-    padding: 60px 16px;
+    padding: 60px 16px 230px;
     display: flex;
     flex-direction: column;
     gap: 200px; /* odstęp między rzędami */
