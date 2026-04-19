@@ -391,7 +391,7 @@ ul {
     /* HERO GRID — dwie kolumny obok siebie, mniejsze karty */
     .hero-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        gap: 24px;
         padding: 8px;
     }
 
@@ -433,7 +433,7 @@ ul {
 
     /* Kółka dalej od siebie żeby serce miało przestrzeń */
     .char-pair-row {
-        gap: 60px;
+        gap: 110px;
         justify-content: center;
     }
 
