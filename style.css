@@ -502,3 +502,246 @@ ul {
         padding: 16px;
     }
 }
+
+/* =========================
+   AUTORKI
+   ========================= */
+.authors-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 16px 90px;
+  color: #fff;
+}
+
+.authors-header {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.authors-header h2 {
+  font-size: 30px;
+  font-weight: 500;
+  margin: 0 0 10px;
+  letter-spacing: 0.5px;
+}
+
+.authors-header p {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.82);
+}
+
+.authors-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.author-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 28px;
+  background: rgba(8,8,8,0.82);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.author-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px rgba(0,0,0,0.42);
+}
+
+.author-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.06), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(255,255,255,0.04), transparent 30%);
+  pointer-events: none;
+}
+
+.author-card.red {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,0,0,0.45),
+    0 0 24px rgba(255,0,0,0.10),
+    0 18px 40px rgba(0,0,0,0.35);
+}
+
+.author-card.blue {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(0,126,255,0.45),
+    0 0 24px rgba(0,126,255,0.10),
+    0 18px 40px rgba(0,0,0,0.35);
+}
+
+.author-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.author-avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid rgba(255,255,255,0.15);
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.03);
+}
+
+.author-card.red .author-avatar {
+  border-color: rgba(255,0,0,0.55);
+  box-shadow: 0 0 0 6px rgba(255,0,0,0.08), 0 0 30px rgba(255,0,0,0.18);
+}
+
+.author-card.blue .author-avatar {
+  border-color: rgba(0,126,255,0.55);
+  box-shadow: 0 0 0 6px rgba(0,126,255,0.08), 0 0 30px rgba(0,126,255,0.18);
+}
+
+.author-headline {
+  min-width: 0;
+}
+
+.author-name {
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.author-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.author-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.author-card.red .author-tag {
+  background: rgba(255,0,0,0.16);
+  border: 1px solid rgba(255,0,0,0.35);
+  color: #fff;
+}
+
+.author-card.blue .author-tag {
+  background: rgba(0,126,255,0.16);
+  border: 1px solid rgba(0,126,255,0.35);
+  color: #fff;
+}
+
+.author-intro {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.9);
+}
+
+.author-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.author-block {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.author-block h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+}
+
+.author-block p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.92);
+}
+
+.author-block ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.author-block li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.92);
+}
+
+.author-quote {
+  position: relative;
+  z-index: 1;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  text-align: center;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.76);
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(255,255,255,0.12);
+}
+
+@media (max-width: 700px) {
+  .author-card {
+    padding: 22px 18px;
+  }
+
+  .author-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .author-meta {
+    justify-content: center;
+  }
+
+  .author-name {
+    font-size: 23px;
+  }
+
+  .author-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .author-avatar {
+    width: 82px;
+    height: 82px;
+  }
+}

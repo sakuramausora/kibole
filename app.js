@@ -12,6 +12,7 @@ const SCREEN_FILES = {
     'choose':  'choose.html',
     'result':  'result.html',
     'recipes': 'recipes.html',
+    'authors': 'authors.html',
 };
 
 // ── Nawigacja ──────────────────────────────────────────
