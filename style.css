@@ -392,7 +392,7 @@ ul {
 .hero-grid {
     grid-template-columns: 1fr 1fr;
     row-gap: 16px;
-    column-gap: 32px;
+    column-gap: 40px;
     padding: 20px 0;   /* tylko góra/dół, bez lewej/prawej */
     max-width: 100%;
 }
