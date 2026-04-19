@@ -389,20 +389,23 @@ ul {
     }
 
     /* HERO GRID — dwie kolumny obok siebie, mniejsze karty */
-    .hero-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        padding: 8px;
-    }
+.hero-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    column-gap: 48px;   /* więcej miejsca między kartami */
+    padding: 8px;
+}
 
-    /* Serce zostaje jako overlay */
-    .hero-grid .pair-divider {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-    }
+.hero-grid .pair-divider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    width: 44px;
+    margin: 0 auto;          /* auto po obu stronach = idealny środek */
+    transform: translateY(-50%);
+    pointer-events: none;
+}
 
     /* Karty bohaterów — mniejsze fonty i avatar */
     .hero-name {
@@ -433,9 +436,22 @@ ul {
 
     /* Kółka dalej od siebie żeby serce miało przestrzeń */
     .char-pair-row {
-        gap: 110px;
-        justify-content: center;
-    }
+    gap: 160px;          /* było 110px — więcej przestrzeni */
+    justify-content: center;
+    position: relative;  /* ← to kluczowe dla absolute serca! */
+}
+
+/* Serca między kółkami — wyśrodkowanie przez margin auto */
+.char-pair-row .pair-divider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    width: 44px;
+    margin: 0 auto;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
 
     /* Mniejsze kółka postaci */
     .char-circle {
