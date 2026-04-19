@@ -146,23 +146,33 @@ nav a.active {
 .border-karpaty { border-color: #26146e; }
 .char-circle.border-karpaty:hover { box-shadow: 0 0 25px rgba(38, 20, 110,0.5); }
 
-/* NOWE */
 .char-tooltip {
-    visibility: hidden; width: 160px;
-    background: rgba(10,10,10,0.98); color: #fff;
-    text-align: center; border-radius: 12px; padding: 10px;
-    position: absolute; bottom: -10px; left: 50%;
-    transform: translate(-50%, 100%);
-    opacity: 0; transition: all 0.3s ease;
-    font-size: 8px; border: 1px solid rgba(255,255,255,0.15);
+    visibility: hidden;
+    opacity: 0;
+    width: 160px;
+    background: rgba(10,10,10,0.98);
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    padding: 10px 10px 10px;
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%, 12px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    font-size: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
     pointer-events: auto;
     box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-    padding-top: 18px;
-    margin: 0px;
     z-index: 9999;
 }
+
 .char-circle:hover .char-tooltip,
-.char-tooltip:hover { visibility: visible; opacity: 1; bottom: -5px; }
+.char-tooltip:hover {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(-50%, -18px);
+}
 
 /* SCREEN: widoczność */
 .screen { display: none; }
