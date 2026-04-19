@@ -92,7 +92,7 @@ nav a.active {
 .char-section {
     max-width: 650px;
     margin: 0 auto;
-    padding: 60px 16px 230px;
+    padding: 60px 16px 250px;
     display: flex;
     flex-direction: column;
     gap: 200px; /* odstęp między rzędami */
@@ -423,7 +423,7 @@ ul {
     /* SEKCJA DRUGOPLANOWYCH — wyłączamy przesunięcia zigzag */
     .char-section {
         gap: 100px;
-        padding: 40px 16px 180px;
+        padding: 40px 16px 250px;
     }
     .char-pair-row:nth-child(odd) {
         transform: none;
