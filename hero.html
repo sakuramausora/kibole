@@ -45,43 +45,72 @@
 
 
 <!-- POSTACIE GŁÓWNE -->
+
 <div style="padding:24px 16px;">
     <h2 style="text-align:center;font-size:16px;font-weight:500;color:rgba(255,255,255,0.9);margin:0 0 32px;">
         Poznaj bohaterów
     </h2>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;max-width:650px;margin:0 auto; padding:20px">
+<div class="hero-grid">
 
-        <div class="hero-card" style="border:2px solid #ff0000;">
-            <img src="ernest.jpg" alt="Ernest"
-                 class="hero-avatar" style="border-color:#ff0000;"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-            <div style="display:none;width:64px;height:64px;border-radius:50%;background:#ff0000;
-                        align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;
-                        color:white;font-weight:500;">E</div>
-            <div class="hero-name">Ernest</div>
-            <div style="margin:6px 0;"><span class="tag hero-tag" style="background:#ff0000;color:white;">Resovia</span></div>
-            <div class="hero-desc">
-                Dorastał z czerwono-białymi barwami. Miłość do klubu przechodzi z ojca na syna.
-                Lecz czy nienawiść również?
-            </div>
+    <!-- ERNEST -->
+    <div class="hero-card" style="border:2px solid #ff0000;">
+        <img src="ernest.jpg" alt="Ernest"
+             class="hero-avatar" style="border-color:#ff0000;"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div style="display:none;width:64px;height:64px;border-radius:50%;background:#ff0000;
+                    align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;
+                    color:white;font-weight:500;">E</div>
+        <div class="hero-name">Ernest</div>
+        <div style="margin:6px 0;">
+            <span class="tag hero-tag" style="background:#ff0000;color:white;">Resovia</span>
         </div>
-
-        <div class="hero-card" style="border:2px solid #007eff;">
-            <img src="louis.jpg" alt="Louis"
-                 class="hero-avatar" style="border-color:#007eff;"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-            <div style="display:none;width:64px;height:64px;border-radius:50%;background:#007eff;
-                        align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;
-                        color:white;font-weight:500;">L</div>
-            <div class="hero-name">Louis</div>
-            <div style="margin:6px 0;"><span class="tag hero-tag" style="background:#007eff;color:white;">Stal</span></div>
-            <div class="hero-desc">
-                Syn piłkarza. W kibolstwie odnalazł sens życia. Czy tak pozostanie?
-            </div>
+        <div class="hero-desc">
+            Dorastał z czerwono-białymi barwami. Miłość do klubu przechodzi z ojca na syna.
+            Lecz czy nienawiść również?
         </div>
-
     </div>
+
+    <!-- LOUIS -->
+    <div class="hero-card" style="border:2px solid #007eff;">
+        <img src="louis.jpg" alt="Louis"
+             class="hero-avatar" style="border-color:#007eff;"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div style="display:none;width:64px;height:64px;border-radius:50%;background:#007eff;
+                    align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;
+                    color:white;font-weight:500;">L</div>
+        <div class="hero-name">Louis</div>
+        <div style="margin:6px 0;">
+            <span class="tag hero-tag" style="background:#007eff;color:white;">Stal</span>
+        </div>
+        <div class="hero-desc">
+            Syn piłkarza. W kibolstwie odnalazł sens życia. Czy tak pozostanie?
+        </div>
+    </div>
+
+    <!-- ❤️ SERCE (overlay) -->
+    <div class="pair-divider">
+        <svg viewBox="0 0 24 24">
+            <defs>
+                <linearGradient id="halfHeartMain" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="50%" stop-color="#ff0000"/>
+                    <stop offset="50%" stop-color="#007eff"/>
+                </linearGradient>
+            </defs>
+            <path fill="url(#halfHeartMain)"
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                     2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.22 2.44
+                     C11.09 5.01 12.76 4 14.5 4
+                     17 4 19 6 19 8.5
+                     c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+    </div>
+
+</div>
+</div>
+
+
+
 
 <!-- POSTACIE DRUGOPLANOWE -->
 <div class="char-section">
@@ -93,24 +122,44 @@
                  onerror="this.style.display='none';">
             <div class="char-tooltip">
                 <strong style="color:#ffffff">Jeremi</strong><br>
-                <div style="margin:6px 0;"><span class="tag hero-tag" style="background:#007eff;color:white;">Stal</span></div>
+                <div style="margin:6px 0;">
+                    <span class="tag hero-tag" style="background:#007eff;color:white;">Stal</span>
+                </div>
                 Z pozoru typowy zjeb. Lecz co kryje się pod tą maską?
             </div>
         </div>
+
+<div class="pair-divider">
+    <svg viewBox="0 0 24 24">
+        <defs>
+            <linearGradient id="heartJerGab" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="50%" stop-color="#007eff"/>
+                <stop offset="50%" stop-color="#26146e"/>
+            </linearGradient>
+        </defs>
+        <path fill="url(#heartJerGab)"
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.22 2.44
+                 C11.09 5.01 12.76 4 14.5 4
+                 17 4 19 6 19 8.5
+                 c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+</div>
         <div class="char-circle border-karpaty">
             <img src="gabriel.jpg" alt="Gabriel"
                  style="width:100%;height:100%;border-radius:50%;object-fit:cover;"
                  onerror="this.style.display='none';">
             <div class="char-tooltip">
                 <strong style="color:#ffffff">Gabriel</strong><br>
-                <div style="margin:6px 0;"><span class="tag hero-tag" style="background:#26146e;color:white;">Karpaty Krosno</span></div>
+                <div style="margin:6px 0;">
+                    <span class="tag hero-tag" style="background:#26146e;color:white;">Karpaty Krosno</span>
+                </div>
                 Jeszcze przed 18-stką został postrachem Krosna. Czy przeprowadzka do Rzeszowa coś zmieni?
             </div>
         </div>
     </div>
 
     <div class="char-pair-row">
-        <!-- Piotr - Stal -->
         <div class="char-circle border-stal">
             <img src="piotr.jpg" alt="Piotr"
                  style="width:100%;height:100%;border-radius:50%;object-fit:cover;"
@@ -122,7 +171,23 @@
             </div>
         </div>
 
-        <!-- Robert - Stal Sanok -->
+<div class="pair-divider">
+    <svg viewBox="0 0 24 24">
+        <defs>
+            <linearGradient id="heartPioRob" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="50%" stop-color="#007eff"/>
+                <stop offset="50%" stop-color="#f0ec13"/>
+            </linearGradient>
+        </defs>
+        <path fill="url(#heartPioRob)"
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.22 2.44
+                 C11.09 5.01 12.76 4 14.5 4
+                 17 4 19 6 19 8.5
+                 c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+</div>
+
         <div class="char-circle border-sanok">
             <img src="robert.jpg" alt="Robert"
                  style="width:100%;height:100%;border-radius:50%;object-fit:cover;"
@@ -136,7 +201,6 @@
     </div>
 
     <div class="char-pair-row">
-        <!-- Nqobizitha - Stal -->
         <div class="char-circle border-stal">
             👤
             <div class="char-tooltip">
@@ -146,7 +210,23 @@
             </div>
         </div>
 
-        <!-- Rudy - Resovia -->
+<div class="pair-divider">
+    <svg viewBox="0 0 24 24">
+        <defs>
+            <linearGradient id="heartNqoRud" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="50%" stop-color="#007eff"/>
+                <stop offset="50%" stop-color="#ff0000"/>
+            </linearGradient>
+        </defs>
+        <path fill="url(#heartNqoRud)"
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.22 2.44
+                 C11.09 5.01 12.76 4 14.5 4
+                 17 4 19 6 19 8.5
+                 c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+</div>
+
         <div class="char-circle border-resovia">
             👤
             <div class="char-tooltip">

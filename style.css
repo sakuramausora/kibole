@@ -122,8 +122,8 @@ nav a.active {
     content: "";
     position: absolute; top: 50%; left: 20%; right: 20%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    z-index: 1;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    z-index: 0;
 }
 
 .char-circle {
@@ -323,14 +323,52 @@ ul {
 }
 .hero-tag {
   display: inline-block;
-  padding: 2px 10px;
   border-radius: 999px;
-  font-size: 8px;
   font-weight: 500;
   margin-bottom: 8px;
+}
+.hero-card .hero-tag {
+  font-size: 14px;
+  padding: 6px 10px;
+}
+.char-tooltip .hero-tag {
+  font-size: 9px;
+  padding: 4px 8px;
 }
 .hero-desc {
   font-size: 20px;
   color: rgba(255,255,255,0.55);
   line-height: 1.5;
 }
+.hero-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ❤️ serce na środku */
+.pair-divider {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pair-divider svg {
+  width: 44px;
+  height: 44px;
+
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
