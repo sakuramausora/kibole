@@ -664,7 +664,7 @@ ul {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 0.9fr;
   gap: 16px;
 }
 
@@ -709,7 +709,7 @@ ul {
   margin-top: 18px;
   padding: 14px 18px;
   border-radius: 14px;
-  text-align: center;
+  text-align: left;
   font-style: italic;
   font-size: 14px;
   line-height: 1.8;
