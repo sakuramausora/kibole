@@ -388,44 +388,41 @@ ul {
         font-size: 13px;
     }
 
-    /* HERO GRID — jedna kolumna zamiast dwóch */
+    /* HERO GRID — dwie kolumny obok siebie, mniejsze karty */
     .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 12px;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 8px;
     }
 
-    /* Serce między głównymi bohaterami — między kartami, nie overlay */
+    /* Serce zostaje jako overlay */
     .hero-grid .pair-divider {
-        position: static;
-        transform: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: -8px auto;
-        order: 2; /* między pierwszą a drugą kartą */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         pointer-events: none;
     }
 
-    /* Karty bohaterów — mniejsze fonty */
+    /* Karty bohaterów — mniejsze fonty i avatar */
     .hero-name {
-        font-size: 20px;
+        font-size: 16px;
     }
     .hero-desc {
-        font-size: 15px;
+        font-size: 12px;
     }
     .hero-avatar {
-        width: 110px;
-        height: 110px;
+        width: 80px;
+        height: 80px;
     }
     .hero-card:hover {
-        transform: scale(1.05); /* mniejszy zoom na mobile */
+        transform: scale(1.05);
     }
 
     /* SEKCJA DRUGOPLANOWYCH — wyłączamy przesunięcia zigzag */
     .char-section {
-        gap: 80px;
-        padding: 40px 16px 160px;
+        gap: 100px;
+        padding: 40px 16px 180px;
     }
     .char-pair-row:nth-child(odd) {
         transform: none;
@@ -434,40 +431,40 @@ ul {
         transform: none;
     }
 
-    /* Mniejszy gap między kółkami — mieszczą się na ekranie */
+    /* Kółka dalej od siebie żeby serce miało przestrzeń */
     .char-pair-row {
-        gap: 20px;
+        gap: 60px;
         justify-content: center;
     }
 
     /* Mniejsze kółka postaci */
     .char-circle {
-        width: 100px;
-        height: 100px;
-        border-width: 5px;
+        width: 80px;
+        height: 80px;
+        border-width: 4px;
     }
     .char-circle:hover {
-        transform: scale(1.3); /* mniej agresywny zoom */
+        transform: scale(1.3);
     }
 
-    /* Tooltip — wyświetlaj nad kółkiem zamiast pod (żeby nie wychodził poza ekran) */
+    /* Tooltip — pod kółkiem */
     .char-tooltip {
         width: 140px;
         font-size: 9px;
-        bottom: auto;
-        top: -10px;
-        transform: translate(-50%, -100%);
+        bottom: -10px;
+        top: auto;
+        transform: translate(-50%, 100%);
     }
     .char-circle:hover .char-tooltip,
     .char-tooltip:hover {
-        bottom: auto;
-        top: -5px;
+        bottom: -5px;
+        top: auto;
     }
 
-    /* Kreska łącząca — krótsza na mobile */
+    /* Kreska łącząca */
     .char-pair-row::before {
-        left: 10%;
-        right: 10%;
+        left: 5%;
+        right: 5%;
     }
 
     /* PRZEPISY — mniejszy padding */
