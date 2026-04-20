@@ -1,0 +1,133 @@
+﻿<head>
+    <meta charset="UTF-8">
+    </head>
+<section class="games-page">
+    <div class="games-header">
+        <h2>Strefa Gier</h2>
+        <p>Sprawdź swoje umiejętności w kibolskich wyzwaniach!</p>
+    </div>
+
+    <div class="games-grid">
+        <article class="game-card">
+            <a href="makaron_louisiana.html" target="_blank" class="game-link">
+                <div class="game-image-container">
+                    <img src="louisiana.jpg" alt="Gra Makaron Louisiana" class="game-img">
+                    <div class="game-overlay">
+                        <span class="play-icon">▶</span>
+                    </div>
+                    <div class="game-tag">Mini-gra</div>
+                </div>
+            </a>
+            <div class="game-content">
+                <h3>Makaron Louisiana</h3>
+                <p>Pomóż Louisowi ugotować swoje ulubione danie!</p>
+                <div class="game-footer">
+                    <span class="difficulty">Trudność: ★☆☆</span>
+                    <a href="makaron-louisiana.html" target="_blank" class="play-btn">Graj teraz</a>
+                </div>
+            </div>
+        </article>
+
+        <article class="game-card placeholder">
+            <div class="game-image-container">
+                <div class="coming-soon">Wkrótce...</div>
+            </div>
+            <div class="game-content">
+                <h3>Nowe Wyzwanie</h3>
+                <p>Kolejna gra pojawi się już niedługo. Trenuj formę!</p>
+            </div>
+        </article>
+    </div>
+</section>
+
+<style>
+    .games-page { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .games-header { text-align: center; margin-bottom: 40px; color: white; }
+    .games-header h2 { font-size: 2.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
+    .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .game-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        border-color: #007eff; /* Kolor Stali */
+    }
+
+    .game-image-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .game-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: scale 0.5s ease;
+    }
+
+    .game-card:hover .game-img { scale: 1.1; }
+
+    .game-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 126, 254, 0.4); /* Stalowy overlay */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .game-card:hover .game-overlay { opacity: 1; }
+
+    .play-icon { font-size: 3rem; color: white; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+
+    .game-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #ff0000; /* Kolor Resovii */
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .game-content { padding: 20px; color: white; }
+    .game-content h3 { margin: 0 0 10px 0; font-size: 1.4rem; color: #007eff; }
+    .game-content p { font-size: 0.9rem; line-height: 1.5; opacity: 0.8; margin-bottom: 20px; }
+
+    .game-footer { display: flex; justify-content: space-between; align-items: center; }
+    .difficulty { font-size: 0.8rem; color: #aaa; }
+
+    .play-btn {
+        background: linear-gradient(90deg, #007eff, #0056b3);
+        color: white;
+        text-decoration: none;
+        padding: 8px 20px;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+
+    .play-btn:hover { background: #ff0000; }
+
+    .game-card.placeholder { opacity: 0.5; filter: grayscale(1); }
+    .coming-soon { height: 100%; display: flex; align-items: center; justify-content: center; background: #222; font-weight: bold; color: #444; }
+</style>

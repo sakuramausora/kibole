@@ -13,6 +13,7 @@ const SCREEN_FILES = {
     'result':  'result.html',
     'recipes': 'recipes.html',
     'authors': 'authors.html',
+    'games':   'games.html',
 };
 
 // ── Nawigacja ──────────────────────────────────────────
