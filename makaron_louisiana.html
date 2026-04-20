@@ -1,0 +1,614 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#G{font-family:var(--font-sans);background:#1a1008;color:#fff;border-radius:12px;overflow:hidden;width:100%}
+#main-row{display:flex;flex-direction:row;width:100%}
+#view{position:relative;width:70%;height:85dvh;overflow:hidden;flex-shrink:0}
+#inv-panel{width:30%;min-width:140px;background:rgba(0,0,0,0.78);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;padding:12px 10px;gap:8px;overflow-y:auto;height:85dvh}
+#inv-panel-title{font-size:15px;color:#aaa;letter-spacing:.03em;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;font-weight:500}
+#inv-capacity{font-size:13px;padding:3px 8px;border-radius:5px;display:inline-block;flex-shrink:0}
+#inv-items-grid{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;flex:1}
+.scene{position:absolute;inset:0;display:none}
+.scene.active{display:block}
+.scene-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  pointer-events:none;
+  z-index:1
+}
+#msg-bar{background:rgba(0,0,0,0.85);padding:12px 18px;min-height:44px;font-size:16px;color:#ffe066;border-top:1px solid rgba(255,255,255,0.08)}
+#btn-row{background:rgba(0,0,0,0.55);padding:9px 12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.06)}
+#btn-row button{font-size:14px;padding:7px 16px}
+#btn-row button.hl{border-color:#ffe066;color:#ffe066}
+.hs{position:absolute;z-index:10;pointer-events:auto;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.hs:hover{background:rgba(255,220,80,0.08);border:2px solid rgba(255,220,80,0.3)}
+#pop{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.93);color:#ffe066;padding:10px 22px;border-radius:24px;font-size:15px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:30;max-width:90%;white-space:normal;text-align:center}
+#pop.on{opacity:1}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:25}
+.modal{background:#2a1c0c;border:1px solid rgba(255,200,80,.35);border-radius:12px;padding:22px;min-width:260px;max-width:340px}
+.modal h3{font-size:17px;font-weight:500;color:#ffe066;margin-bottom:14px;text-align:center}
+.modal-items{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.m-item{font-size:28px;cursor:pointer;padding:8px 14px;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.05);transition:background .15s,transform .1s;text-align:center}
+.m-item:hover{background:rgba(255,220,80,.15);border-color:#ffe066;transform:scale(1.1)}
+.m-item.taken{opacity:.28;pointer-events:none}
+.m-item span{font-size:12px;display:block;color:#aaa;margin-top:2px}
+.modal-close{display:block;margin:14px auto 0;font-size:14px;padding:7px 18px}
+
+.cooking-view{width:100%;height:100%;background:#180e04;display:flex;flex-direction:column}
+.vessels-row{flex:1;display:flex;align-items:flex-end;padding-bottom:10px}
+.pot-area,.pan-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;padding-bottom:8px}
+.pot-area{border-right:1px solid rgba(255,255,255,.08)}
+.vessel-label{font-size:15px;color:#aaa;margin-bottom:2px;font-weight:500}
+.vessel-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.steam-txt{position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:24px;opacity:0;transition:opacity .4s;pointer-events:none}
+.steam-txt.on{opacity:1;animation:stm 1.4s ease-in-out infinite alternate}
+@keyframes stm{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-8px)}}
+.vessel-contents{font-size:13px;color:#ffcc77;text-align:center;min-height:16px;margin-top:2px;max-width:180px}
+.drop-zone{border:2px dashed rgba(255,200,80,.3);border-radius:8px;padding:6px 14px;font-size:13px;color:#777;text-align:center;margin-top:4px;min-width:140px;cursor:pointer;transition:border-color .15s,background .15s}
+.drop-zone:hover{border-color:rgba(255,200,80,.6);color:#ffe066;background:rgba(255,220,80,.06)}
+.drop-zone.active-dz{border-color:#ffe066;color:#ffe066;background:rgba(255,220,80,.1)}
+
+.burner-zone{display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;user-select:none;margin-top:4px}
+.burner-ring{width:64px;height:22px;border-radius:50%;border:3px solid #555;position:relative;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+.burner-ring.on{border-color:#e06020}
+.burner-knob{width:18px;height:18px;border-radius:50%;background:#444;border:2px solid #666;transition:background .2s,border-color .2s}
+.burner-ring.on .burner-knob{background:#e07030;border-color:#ffa040}
+.burner-label{font-size:11px;color:#666;margin-top:2px;transition:color .2s}
+.burner-ring.on+.burner-label{color:#ffa040}
+
+.flame-wrap{position:relative;width:64px;height:38px;margin-top:0}
+.flame{position:absolute;bottom:0;animation:flicker ease-in-out infinite alternate;transform-origin:bottom center;opacity:0;transition:opacity .3s}
+.flame.on{opacity:1}
+.f1{left:8px;width:10px;height:28px;background:linear-gradient(to top,#ff6000,#ffaa00,#ffee00);border-radius:50% 50% 30% 30%;animation-duration:0.4s;animation-delay:0s}
+.f2{left:20px;width:14px;height:36px;background:linear-gradient(to top,#ff4000,#ff8800,#ffcc00);border-radius:50% 50% 30% 30%;animation-duration:0.35s;animation-delay:.07s}
+.f3{left:36px;width:12px;height:30px;background:linear-gradient(to top,#ff5000,#ff9900,#ffdd00);border-radius:50% 50% 30% 30%;animation-duration:0.45s;animation-delay:.12s}
+.f4{left:14px;width:8px;height:20px;background:linear-gradient(to top,#ff3000,#ff7700);border-radius:50% 50% 30% 30%;animation-duration:0.3s;animation-delay:.05s}
+.f5{left:34px;width:9px;height:22px;background:linear-gradient(to top,#ff4500,#ff8800);border-radius:50% 50% 30% 30%;animation-duration:0.38s;animation-delay:.15s}
+@keyframes flicker{
+  0%{transform:scaleY(1) scaleX(1) rotate(-1deg)}
+  25%{transform:scaleY(1.08) scaleX(.95) rotate(1deg)}
+  50%{transform:scaleY(.93) scaleX(1.04) rotate(-2deg)}
+  75%{transform:scaleY(1.1) scaleX(.97) rotate(1.5deg)}
+  100%{transform:scaleY(.97) scaleX(1.02) rotate(-1deg)}
+}
+
+.cook-steps-row{padding:6px 10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;background:rgba(0,0,0,.35)}
+.cs-chip{font-size:22px;cursor:pointer;padding:5px 9px;border:1.5px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);transition:background .15s,transform .1s;position:relative}
+.cs-chip:hover{background:rgba(255,220,80,.12);border-color:#ffe066;transform:scale(1.08)}
+.cs-chip.done{opacity:.25;pointer-events:none}
+.cs-chip.next-step{border-color:#ffe066;background:rgba(255,220,80,.1);animation:glow .9s ease-in-out infinite alternate}
+@keyframes glow{from{box-shadow:0 0 0 0 rgba(255,220,80,.15)}to{box-shadow:0 0 0 5px rgba(255,220,80,.2)}}
+.cs-chip .cs-lb{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:11px;white-space:nowrap;color:#ffe066;background:rgba(0,0,0,.88);padding:2px 6px;border-radius:4px;opacity:0;pointer-events:none;z-index:10}
+.cs-chip:hover .cs-lb{opacity:1}
+.prog-dots{display:flex;gap:4px;justify-content:center;padding:4px 0 6px}
+.pd{width:26px;height:6px;border-radius:3px;background:rgba(255,255,255,.1)}
+.pd.done{background:#4caf50}.pd.cur{background:#ffe066;animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.6}to{opacity:1}}
+
+.inv-item{font-size:44px;cursor:pointer;padding:10px;border-radius:10px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);display:inline-flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s;position:relative;width:72px;height:72px;line-height:1}
+.inv-item:hover{border-color:#ffe066;background:rgba(255,220,80,.12)}
+.inv-item.selected{border-color:#ffe066;background:rgba(255,220,80,.22);box-shadow:0 0 0 2px rgba(255,220,80,.3)}
+.inv-item .inv-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);font-size:13px;white-space:nowrap;color:#ffe066;background:rgba(0,0,0,.93);padding:4px 10px;border-radius:6px;opacity:0;pointer-events:none;z-index:50;transition:opacity .12s;border:1px solid rgba(255,220,80,.2)}
+.inv-item:hover .inv-tooltip{opacity:1}
+.drop-btn{font-size:12px;color:#ff9060;cursor:pointer;text-align:center;padding:2px 0;margin-top:3px;width:72px;line-height:1.3;border:none;background:none;text-decoration:underline}
+.drop-btn:hover{color:#ff6040}
+
+.final-overlay{position:absolute;inset:0;background:rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:20}
+.final-dish{font-size:80px;animation:bounce .6s ease-in-out infinite alternate}
+@keyframes bounce{from{transform:scale(1)}to{transform:scale(1.08)}}
+.final-title{font-size:26px;font-weight:500;color:#ffe066}
+.final-sub{font-size:16px;color:#ccc}
+.cap-ok{background:rgba(80,200,80,.15);color:#8f8}
+.cap-warn{background:rgba(255,180,0,.15);color:#ffc040}
+.cap-full{background:rgba(255,80,80,.18);color:#ff8080}
+#s-kitchen1{
+  position:relative;
+}
+
+.hotspot-layer{
+  position:absolute;
+  inset:0;
+}
+
+</style>
+
+<div id="G">
+<div id="main-row">
+<div id="view">
+  <div id="s-kitchen1" class="scene active">
+    <img class="scene-img" src="kuchnia.png" alt="kuchnia"/>
+  </div>
+  <div id="s-cooking" class="scene">
+    <div class="cooking-view">
+      <div class="vessels-row">
+        <div class="pot-area">
+          <div class="vessel-label">Garnek</div>
+          <div class="vessel-wrap">
+            <div class="steam-txt" id="pot-steam">💨💨</div>
+            <svg width="180" height="165" viewBox="0 0 200 185">
+              <ellipse cx="100" cy="170" rx="68" ry="11" fill="#1a1008"/>
+              <rect x="22" y="72" width="156" height="96" rx="18" fill="#555" stroke="#777" stroke-width="2"/>
+              <rect x="17" y="64" width="166" height="20" rx="9" fill="#666" stroke="#888" stroke-width="1.5"/>
+              <rect x="3" y="67" width="22" height="13" rx="5" fill="#444" stroke="#666"/>
+              <rect x="175" y="67" width="22" height="13" rx="5" fill="#444" stroke="#666"/>
+              <rect x="76" y="56" width="48" height="15" rx="7" fill="#555" stroke="#777"/>
+              <ellipse id="pot-liq" cx="100" cy="74" rx="67" ry="10" fill="#4488aa" opacity="0"/>
+              <text id="pot-emo" x="100" y="138" text-anchor="middle" font-size="38" opacity="0"></text>
+            </svg>
+          </div>
+          <div class="vessel-contents" id="pot-txt"></div>
+          <div class="drop-zone" id="dz-pot" onclick="dropOnVessel('pot')">⬆ upuść tutaj</div>
+          <div class="burner-zone" onclick="toggleBurner('pot')" title="Włącz/wyłącz palnik">
+            <div class="flame-wrap" id="flame-pot">
+              <div class="flame f1" id="fp1"></div>
+              <div class="flame f2" id="fp2"></div>
+              <div class="flame f3" id="fp3"></div>
+              <div class="flame f4" id="fp4"></div>
+              <div class="flame f5" id="fp5"></div>
+            </div>
+            <div class="burner-ring" id="burner-pot"><div class="burner-knob"></div></div>
+            <div class="burner-label" id="blabel-pot">palnik wyłączony</div>
+          </div>
+        </div>
+        <div class="pan-area">
+          <div class="vessel-label">Patelnia</div>
+          <div class="vessel-wrap">
+            <div class="steam-txt" id="pan-steam">💨</div>
+            <svg width="200" height="130" viewBox="0 0 220 145">
+              <ellipse cx="103" cy="132" rx="78" ry="10" fill="#1a1008"/>
+              <ellipse cx="103" cy="76" rx="84" ry="26" fill="#555" stroke="#777" stroke-width="2"/>
+              <rect x="19" y="50" width="168" height="66" fill="#555"/>
+              <ellipse cx="103" cy="50" rx="84" ry="26" fill="#666" stroke="#888" stroke-width="2"/>
+              <rect x="187" y="62" width="48" height="13" rx="5" fill="#444" stroke="#666"/>
+              <ellipse id="pan-liq" cx="103" cy="50" rx="75" ry="20" fill="#c84030" opacity="0"/>
+              <text id="pan-emo" x="103" y="100" text-anchor="middle" font-size="32" opacity="0"></text>
+            </svg>
+          </div>
+          <div class="vessel-contents" id="pan-txt"></div>
+          <div class="drop-zone" id="dz-pan" onclick="dropOnVessel('pan')">⬆ upuść tutaj</div>
+          <div class="burner-zone" onclick="toggleBurner('pan')" title="Włącz/wyłącz palnik">
+            <div class="flame-wrap" id="flame-pan">
+              <div class="flame f1" id="fn1"></div>
+              <div class="flame f2" id="fn2"></div>
+              <div class="flame f3" id="fn3"></div>
+              <div class="flame f4" id="fn4"></div>
+              <div class="flame f5" id="fn5"></div>
+            </div>
+            <div class="burner-ring" id="burner-pan"><div class="burner-knob"></div></div>
+            <div class="burner-label" id="blabel-pan">palnik wyłączony</div>
+          </div>
+        </div>
+      </div>
+      <div class="cook-steps-row" id="cook-panel"></div>
+      <div class="prog-dots" id="prog-dots"></div>
+    </div>
+  </div>
+  <div id="s-final" class="scene">
+    <div class="final-overlay">
+      <div class="final-dish">🍝</div>
+      <div class="final-title">Makaron Louisiana gotowy!</div>
+      <div class="final-sub">Arcydzieło kuchni Południa – brawo! 🎉</div>
+      <button onclick="resetGame()" style="margin-top:10px;font-size:15px;padding:8px 22px">Zagraj ponownie</button>
+    </div>
+  </div>
+  <div id="modal-wrap" style="display:none" class="modal-bg">
+    <div class="modal">
+      <h3 id="modal-title">Zawartość</h3>
+      <div class="modal-items" id="modal-items"></div>
+      <button class="modal-close" onclick="closeModal()">Zamknij</button>
+    </div>
+  </div>
+  <div id="pop"></div>
+</div>
+<div id="inv-panel">
+  <div id="inv-panel-title">🎒 Ekwipunek</div>
+  <div id="inv-capacity" class="cap-ok" style="font-size:13px;padding:3px 8px;border-radius:5px;display:inline-block">0 / 10</div>
+  <div id="inv-items-grid"></div>
+</div>
+</div>
+<div id="msg-bar">Eksploruj kuchnię – klikaj w szafki, lodówkę i sprzęty!</div>
+<div id="btn-row"></div>
+</div>
+
+<script>
+const INV_MAX=10;
+
+const ALL_ITEMS={
+  makaron:  {icon:"🍝",label:"Makaron",    vessel:"pot"},
+  maslo:    {icon:"🧈",label:"Masło",      vessel:"pan"},
+  parmezan: {icon:"🧀",label:"Parmezan",   vessel:"pan"},
+  jalapeno: {icon:"🌶️",label:"Jalapeño",  vessel:"pan"},
+  sol:      {icon:"🧂",label:"Sól",        vessel:"pot"},
+  krewetki: {icon:"🦐",label:"Krewetki",   vessel:"pan"},
+  mascarpone:{icon:"🫙",label:"Mascarpone",vessel:"pan"},
+  smietanka:{icon:"🥛",label:"Śmietanka",  vessel:"pan"},
+  cytryna:  {icon:"🍋",label:"Cytryna",    vessel:"pan"},
+  czosnek:  {icon:"🧄",label:"Czosnek",    vessel:"pan"},
+  mleko:    {icon:"🥛",label:"Mleko",      vessel:"pan"},
+  garnek:   {icon:"🫕",label:"Garnek",     vessel:null},
+  patelnia: {icon:"🍳",label:"Patelnia",   vessel:null},
+  woda:     {icon:"💧",label:"Woda",       vessel:"pot"},
+  talerze:  {icon:"🍽️",label:"Talerze",   vessel:null,junk:true},
+  miski:    {icon:"🥣",label:"Miski",      vessel:null,junk:true},
+  przyprawy:{icon:"🫙",label:"Przyprawy",  vessel:null,junk:true},
+  kubki:    {icon:"☕",label:"Kubki",      vessel:null,junk:true},
+  gabka:    {icon:"🧽",label:"Gąbka",     vessel:null,junk:true},
+  noz:      {icon:"🔪",label:"Nóż",       vessel:null,junk:true},
+  lyzka:    {icon:"🥄",label:"Łyżka",     vessel:null,junk:true},
+  oliwa:    {icon:"🫒",label:"Oliwa",     vessel:null,junk:true},
+  kawa:     {icon:"☕",label:"Kawa",      vessel:null,junk:true}
+};
+
+// Sarkastyczne komentarze: klucz = składnik który próbujemy dodać, wartość = funkcja(kontekst)
+const SARCASM_JUNK={
+  gabka:    ()=>"Gąbka w garnku? Genialnie. Zupa z detergentem – nowa klasyka.",
+  noz:      ()=>"Weź to odłóż bo się pokaleczysz...",
+  lyzka:    ()=>"Łyżka jako składnik? Ciekawy pomysł, ale chyba nie o to chodzi.",
+  talerze:  ()=>"Talerz do gotowania? Na nim się podaje, nie gotuje.",
+  miski:    ()=>"Miska w garnku. Nowa potrawa.",
+  kubki:    ()=>"Kubek jako składnik? To nie herbata.",
+  oliwa:    ()=>"Oliwa – elegancki wybór. Szkoda, że nie w tym przepisie.",
+  kawa:     ()=>"Louis lubi kawę, ale bez przesady.",
+  przyprawy:()=>"'Przyprawy' to nie składnik, to szuflada. Bądź konkretny.",
+  garnek:   ()=>"Garnek do garnka? Ciekawe zagnieżdżenie.",
+  patelnia: ()=>"Już mamy patelnię. W zupełności wystarczy"
+};
+
+const SARCASM_WRONG_VESSEL={
+  makaron:  v=>v==="pan"?"Makaron na patelni bez wody? Świetnie, zrobimy chipsy makaronowe.":"",
+  maslo:    v=>v==="pot"?"Masło do garnka z wodą? Ciekawy eksperyment z tłuszczem.":"",
+  sol:      v=>v==="pan"?"Sól na suchą patelnię? Dodamy jeszcze kukurydzę i będzie przypalony popcorn.":"",
+  woda:     v=>v==="pan"?"Woda na patelnię? Będzie syczało, ale sensu za grosz.":"",
+  czosnek:  v=>v==="pot"?"Czosnek prosto do wody? To zupa czosnkowa, nie sos.":"",
+  krewetki: v=>v==="pot"?"Krewetki gotowane w wodzie makaronowej? Smaczne, ale to nie ten przepis.":"",
+  cytryna:  v=>v==="pot"?"Cytryna do makaronu? Kwaśny makaron – nowość sezonu.":"",
+  parmezan: v=>v==="pot"?"Parmezan do garnka z wodą? Ciekawy napar serowy.":"",
+  jalapeno: v=>v==="pot"?"Jalapeño do wrzątku? Zupa paprykowa, nie Louisiana.":"",
+  mascarpone:v=>v==="pot"?"Mascarpone do garnka? Krem z makaronu – haute cuisine.":"",
+  smietanka:v=>v==="pot"?"Śmietanka do wrzątku? Biała zupa. Elegancko, ale nie.":"",
+  mleko:    v=>v==="pot"?"Mleko do makaronu? Zupa mleczna.":""
+};
+
+const SARCASM_ORDER={
+  makaron:  (step)=>{
+    const s=COOK_STEPS[step];
+    if(s&&s.id==="water")return "Makaron bez wody? Świetny pomysł. Uprażymy go zamiast ugotować.";
+    if(s&&s.id==="salt")return "Spokojnie z makaronem, najpierw sól do wody.";
+    return "Jeszcze nie czas na makaron.";
+  },
+  maslo:    ()=>"Masło czeka na swoją kolej. Cierpliwości.",
+  czosnek:  ()=>"Czosnek bez rozgrzanego masła? Sam się nie podsmaży.",
+  krewetki: ()=>"Krewetki idą po czosnku. Kolejność ma znaczenie.",
+  sol:      ()=>"Sól jeszcze nie teraz. Woda pierwsza.",
+  cytryna:  ()=>"Cytryna na końcu, żeby nie zepsuła sosu.",
+  parmezan: ()=>"Parmezan razem z jalapeño, nie teraz.",
+  jalapeno: ()=>"Jalapeño z parmezanem, daj sosowi dojść.",
+  mascarpone:()=>"Mascarpone za wcześnie – najpierw sos bazowy.",
+  smietanka: ()=>"Śmietanka po maśle i czosnku. Chwila cierpliwości.",
+  mleko:    ()=>"Mleko razem z resztą sosu, nie samodzielnie.",
+  woda:     ()=>"Woda już jest w garnku.",
+};
+
+const CONTAINERS=[
+  {id:"cab_ul",  label:"Szafka górna lewa",  scene:1,items:["talerze","miski"],  x:2.7, y:20.7, w:26.4, h:30.2},
+
+  {id:"cab_uc",  label:"Szafka nad okapem",  scene:1,items:["przyprawy"],        x:29.9,y:21.0, w:16.9, h:14.4},
+
+  {id:"cab_ur",  label:"Szafka górna prawa", scene:1,items:["kubki"],            x:53.6,y:20.9, w:15.3, h:30.3}, // ✔ poprawione
+
+  {id:"cab_far", label:"Szafka skrajna",     scene:1,items:["czosnek"],          x:70.6,y:19.1, w:22.6, h:17.3},
+
+  {id:"fridge",  label:"Lodówka",            scene:1,items:["krewetki","mascarpone","mleko","maslo","smietanka","parmezan"], x:71.6,y:38.2, w:22.0, h:61.1},
+
+  {id:"cab_dl",  label:"Szafka dolna lewa",  scene:1,items:["makaron","sol"],    x:2.0, y:78.3, w:9.7,  h:17.3},
+
+  {id:"cab_dc",  label:"Szafka pod zlewem",  scene:1,items:["gabka"],            x:28.8,y:80.5, w:19.5, h:15.7},
+
+  {id:"cab_dr",  label:"Szafka dolna prawa", scene:1,items:["patelnia"],         x:49.6,y:78.2, w:19.1, h:17.5},
+
+  {id:"drawer_l",label:"Szuflada lewa",      scene:1,items:["noz"],              x:13.0,y:73.3, w:14.1, h:4.1},
+
+  {id:"drawer_r",label:"Szuflada prawa",     scene:1,items:["lyzka"],            x:49.5,y:72.9, w:19.1, h:4.2},
+
+  {id:"sink",    label:"Zlew",               scene:1,items:["woda"],             x:29.0,y:69.5, w:19.4, h:10.8},
+
+  {id:"tap",     label:"Kran",               scene:1,items:["woda"],             x:36.7,y:54.5, w:4.8,  h:15.2},
+
+  {id:"counter_l",label:"Blat lewy",         scene:1,items:["oliwa","cytryna"],  x:3.0, y:68.5, w:25.4, h:3.4},
+
+  {id:"counter_r",label:"Blat prawy",        scene:1,items:["kawa"],             x:48.6,y:68.9, w:21.1, h:3.0}
+];
+
+const NEED_ALL=["makaron","maslo","parmezan","jalapeno","sol","krewetki","mascarpone","smietanka","cytryna","czosnek","mleko","garnek","patelnia","woda"];
+
+const COOK_STEPS=[
+  {id:"water", icon:"💧",label:"Nalej wodę do garnka",             vessel:"pot", needs:["woda"],     potColor:"#3a78aa",potOp:.75,potEmo:"💧",potTxt:"Woda w garnku!"},
+  {id:"salt",  icon:"🧂",label:"Wsyp sól",                         vessel:"pot", needs:["sol"],      potColor:"#3a78aa",potOp:.75,potEmo:"💧",potTxt:"Osolona woda!"},
+  {id:"pasta", icon:"🍝",label:"Wrzuć makaron",                    vessel:"pot", needs:["makaron"],  potColor:"#c8a060",potOp:.9, potEmo:"🍝",potTxt:"Gotuje się 8 min"},
+  {id:"butter",icon:"🧈",label:"Rozgrzej masło",                   vessel:"pan", needs:["maslo"],    panColor:"#e8c060",panOp:.8, panEmo:"🧈",panTxt:"Masło się topi..."},
+  {id:"garlic",icon:"🧄",label:"Podsmaż czosnek",                  vessel:"pan", needs:["czosnek"],  panColor:"#d4a830",panOp:.88,panEmo:"🧄",panTxt:"Złocisty aromat!"},
+  {id:"shrimp",icon:"🦐",label:"Smaż krewetki",                    vessel:"pan", needs:["krewetki"], panColor:"#e05050",panOp:.9, panEmo:"🦐",panTxt:"Krewetki różowieją!"},
+  {id:"sauce", icon:"🫙",label:"Dodaj mascarpone, śmietankę, mleko",vessel:"pan",needs:["mascarpone","smietanka","mleko"],panColor:"#f0e8c0",panOp:.95,panEmo:"🥣",panTxt:"Kremowy sos!"},
+  {id:"spice", icon:"🌶️",label:"Jalapeño i parmezan",             vessel:"pan", needs:["jalapeno","parmezan"],panColor:"#c84040",panOp:.9,panEmo:"🌶️",panTxt:"Pikantnie!"},
+  {id:"lemon", icon:"🍋",label:"Dodaj cytrynę",                    vessel:"pan", needs:["cytryna"],  panColor:"#d4c050",panOp:.92,panEmo:"🍋",panTxt:"Balans smaku!"},
+  {id:"mix",   icon:"✨",label:"Połącz wszystko!",                 vessel:"both",needs:[],           potColor:"#a04820",potOp:1,potEmo:"🍝",potTxt:"Louisiana!",panColor:"#a04820",panOp:1,panEmo:"🍝",panTxt:"Gotowe!"}
+];
+
+let inventory=[],collected={},phase="collect",selectedInvItem=null,cookStep=0;
+let potState={liqColor:"#4488aa",liqOp:0,emo:"",txt:""};
+let panState={liqColor:"#c84030",liqOp:0,emo:"",txt:""};
+let burners={pot:false,pan:false};
+
+function popup(m){
+  const p=document.getElementById("pop");
+  p.textContent=m;p.classList.add("on");
+  clearTimeout(p._t);p._t=setTimeout(()=>p.classList.remove("on"),3200);
+}
+function msg(t){document.getElementById("msg-bar").textContent=t;}
+
+function toggleBurner(v){
+  burners[v]=!burners[v];
+  const ring=document.getElementById("burner-"+v);
+  const lbl=document.getElementById("blabel-"+v);
+  const fw=document.getElementById("flame-"+v);
+  if(burners[v]){
+    ring.classList.add("on");
+    lbl.textContent="palnik włączony";
+    fw.querySelectorAll(".flame").forEach(f=>f.classList.add("on"));
+  } else {
+    ring.classList.remove("on");
+    lbl.textContent="palnik wyłączony";
+    fw.querySelectorAll(".flame").forEach(f=>f.classList.remove("on"));
+  }
+}
+
+function buildHotspots(){
+  document.getElementById("s-kitchen1").querySelectorAll(".hs").forEach(h=>h.remove());
+  CONTAINERS.forEach(c=>{
+    const s=document.getElementById("s-kitchen1");
+    const div=document.createElement("div");
+    div.className="hs";div.id="hs-"+c.id;
+    div.style.cssText=`left:${c.x}%;top:${c.y}%;width:${c.w}%;height:${c.h}%`;
+    div.onclick=()=>openContainer(c.id);
+    s.appendChild(div);
+  });
+}
+
+function openContainer(cid){
+  const c=CONTAINERS.find(x=>x.id===cid);if(!c)return;
+  document.getElementById("modal-title").textContent=c.label;
+  const wrap=document.getElementById("modal-items");wrap.innerHTML="";
+  c.items.forEach(key=>{
+    const it=ALL_ITEMS[key];if(!it)return;
+
+    const div=document.createElement("div");
+    div.className="m-item"+(collected[key]?" taken":"");
+
+    div.innerHTML=`${it.icon}<span>${it.label}</span>`;
+    div.onclick=()=>collectItem(key,cid);
+    wrap.appendChild(div);
+  });
+  document.getElementById("modal-wrap").style.display="flex";
+}
+function closeModal(){document.getElementById("modal-wrap").style.display="none";}
+
+function collectItem(key,cid){
+  if(collected[key])return;
+  if(inventory.length>=INV_MAX){popup("Ekwipunek pełny! Odłóż coś niepotrzebnego.");return;}
+  collected[key]=true;
+  inventory.push(key);
+  const it=ALL_ITEMS[key];
+  popup("Zebrano: "+it.icon+" "+it.label);
+  document.querySelectorAll("#modal-items .m-item").forEach(el=>{
+    if(el.querySelector("span")&&el.querySelector("span").textContent===it.label)el.classList.add("taken");
+  });
+  updateInv();updateMsg();
+}
+
+function dropItem(key){
+  if(!collected[key])return;
+  const idx=inventory.indexOf(key);
+  if(idx>-1)inventory.splice(idx,1);
+  delete collected[key];
+  const it=ALL_ITEMS[key];
+  popup("Odłożono: "+it.icon+" "+it.label);
+  updateInv();updateMsg();
+}
+
+function updateMsg(){
+  if(phase==="cook"){
+    if(cookStep<COOK_STEPS.length){
+      const s=COOK_STEPS[cookStep];
+      msg("Krok "+(cookStep+1)+"/"+COOK_STEPS.length+": "+s.label);
+    }
+    return;
+  }
+  msg("Eksploruj kuchnię – klikaj w szafki, lodówkę i sprzęty!");
+  renderBtns();
+}
+
+function updateInv(){
+  const grid=document.getElementById("inv-items-grid");
+  const cap=document.getElementById("inv-capacity");
+  const n=inventory.length;
+  cap.textContent=n+" / "+INV_MAX;
+  cap.className=n>=INV_MAX?"cap-full":n>=INV_MAX-2?"cap-warn":"cap-ok";
+  cap.style.cssText="font-size:13px;padding:3px 8px;border-radius:5px;display:inline-block";
+  grid.innerHTML="";
+  inventory.forEach(k=>{
+  const it=ALL_ITEMS[k];if(!it)return;
+
+  const wrap=document.createElement("div");
+  wrap.style.cssText="display:flex;flex-direction:column;align-items:center;gap:3px";
+
+  const span=document.createElement("span");
+  span.className="inv-item"+(selectedInvItem===k?" selected":"");
+  span.innerHTML=`${it.icon}<span class="inv-tooltip">${it.label}</span>`;
+  span.onclick=()=>selectItem(k);
+
+  const btn=document.createElement("button");
+  btn.className="drop-btn";
+  btn.textContent="odłóż";
+  btn.onclick=(e)=>{e.stopPropagation();dropItem(k);};
+
+  wrap.appendChild(span);
+  wrap.appendChild(btn);
+  grid.appendChild(wrap);
+});
+  if(inventory.length===0){
+    const empty=document.createElement("span");
+    empty.style.cssText="color:#555;font-size:14px;font-style:italic;padding:4px 0";
+    empty.textContent="pusty";
+    grid.appendChild(empty);
+  }
+}
+
+function selectItem(key){
+  selectedInvItem=selectedInvItem===key?null:key;
+  updateInv();
+  if(phase==="cook"){
+    document.querySelectorAll(".drop-zone").forEach(d=>d.classList.toggle("active-dz",!!selectedInvItem));
+  }
+}
+
+function getSarcasm(key, vessel){
+  const it=ALL_ITEMS[key];
+  if(it&&it.junk){
+    const fn=SARCASM_JUNK[key];
+    return fn?fn():"To nie jest składnik do gotowania.";
+  }
+  if(it&&!it.vessel){
+    return SARCASM_JUNK[key]?SARCASM_JUNK[key]():"To naczynie, nie składnik.";
+  }
+  if(vessel&&it.vessel&&it.vessel!==vessel){
+    const fn=SARCASM_WRONG_VESSEL[key];
+    const txt=fn?fn(vessel):"";
+    return txt||it.label+" nie należy do "+(vessel==="pot"?"garnka":"patelni")+".";
+  }
+  return null;
+}
+
+function dropOnVessel(vessel){
+  if(phase!=="cook"){
+    popup("Najpierw przejdź do gotowania!");return;
+  }
+  if(!selectedInvItem){popup("Najpierw wybierz składnik z ekwipunku!");return;}
+  const key=selectedInvItem;
+  const it=ALL_ITEMS[key];
+
+  if(!it.vessel){
+    const s=getSarcasm(key,vessel);
+    popup(s||it.label+" nie nadaje się do gotowania.");
+    selectedInvItem=null;updateInv();return;
+  }
+  if(it.vessel!==vessel){
+    const s=getSarcasm(key,vessel);
+    popup(s||it.icon+" "+it.label+" należy do "+(it.vessel==="pot"?"garnka":"patelni")+".");
+    selectedInvItem=null;updateInv();return;
+  }
+
+  const step=COOK_STEPS[cookStep];
+  if(!step||!step.needs||!step.needs.includes(key)){
+    const fn=SARCASM_ORDER[key];
+    const txt=fn?fn(cookStep):"Jeszcze nie czas na "+it.label+".";
+    popup(txt);
+    selectedInvItem=null;updateInv();return;
+  }
+
+  if(step.needs.length>1){
+    step._partial=step._partial||[];
+    if(!step._partial.includes(key))step._partial.push(key);
+    const left=step.needs.filter(n=>!step._partial.includes(n));
+    if(left.length>0){popup(it.icon+" dodano!");}
+    else{popup(it.icon+" "+it.label+" dodano!");doStep(cookStep);}
+  } else {
+    popup(it.icon+" "+it.label+" dodano!");doStep(cookStep);
+  }
+  selectedInvItem=null;updateInv();
+}
+
+function doStep(idx){
+  if(idx!==cookStep)return;
+  const s=COOK_STEPS[idx];
+  if(s.potColor){potState={liqColor:s.potColor,liqOp:s.potOp,emo:s.potEmo,txt:s.potTxt};updateVessel("pot");}
+  if(s.panColor){panState={liqColor:s.panColor,liqOp:s.panOp,emo:s.panEmo,txt:s.panTxt};updateVessel("pan");}
+  cookStep++;
+  if(cookStep>=COOK_STEPS.length){msg("Danie gotowe! 🎉");setTimeout(()=>showScene("s-final"),900);}
+  else{renderCookUI();updateMsg();}
+}
+
+function updateVessel(v){
+  const st=v==="pot"?potState:panState;
+  const liq=document.getElementById(v+"-liq"),emo=document.getElementById(v+"-emo");
+  const steam=document.getElementById(v+"-steam"),txt=document.getElementById(v+"-txt");
+  if(liq){liq.setAttribute("fill",st.liqColor);liq.setAttribute("opacity",st.liqOp);}
+  if(emo){emo.textContent=st.emo;emo.setAttribute("opacity",st.liqOp>0?"1":"0");}
+  if(steam&&st.liqOp>0)steam.classList.add("on");
+  if(txt)txt.textContent=st.txt;
+}
+
+function renderBtns(){
+  const bar=document.getElementById("btn-row");bar.innerHTML="";
+  const cookBtn=document.createElement("button");
+  if(phase==="collect"){
+    cookBtn.textContent="Idź gotować 🍳";
+    cookBtn.onclick=()=>goToCooking();
+    bar.appendChild(cookBtn);
+  } else if(phase==="cook"){
+    const backBtn=document.createElement("button");
+    backBtn.textContent="Wróć po składniki 🧺";
+    backBtn.onclick=()=>{phase="collect";buildHotspots();showScene("s-kitchen1");updateMsg();renderBtns();};
+    bar.appendChild(backBtn);
+  }
+}
+
+function showScene(id){
+  document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function goToCooking(){
+  phase="cook";
+  showScene("s-cooking");
+  renderCookUI();updateMsg();renderBtns();
+}
+
+function renderCookUI(){
+  const panel=document.getElementById("cook-panel"),dots=document.getElementById("prog-dots");
+  panel.innerHTML="";dots.innerHTML="";
+  COOK_STEPS.forEach((s,i)=>{
+    const c=document.createElement("div");
+    c.className="cs-chip"+(i<cookStep?" done":(i===cookStep?" next-step":""));
+    c.innerHTML=`${s.icon}<span class="cs-lb">${s.label}</span>`;
+    if(i===cookStep&&(!s.needs||s.needs.length===0))c.onclick=()=>doStep(i);
+    panel.appendChild(c);
+    const d=document.createElement("div");
+    d.className="pd"+(i<cookStep?" done":(i===cookStep?" cur":""));
+    dots.appendChild(d);
+  });
+}
+
+function resetGame(){
+  inventory=[];collected={};phase="collect";selectedInvItem=null;cookStep=0;
+  potState={liqColor:"#4488aa",liqOp:0,emo:"",txt:""};
+  panState={liqColor:"#c84030",liqOp:0,emo:"",txt:""};
+  burners={pot:false,pan:false};
+  ["pot","pan"].forEach(v=>{
+    const ring=document.getElementById("burner-"+v);
+    const lbl=document.getElementById("blabel-"+v);
+    const fw=document.getElementById("flame-"+v);
+    if(ring)ring.classList.remove("on");
+    if(lbl)lbl.textContent="palnik wyłączony";
+    if(fw)fw.querySelectorAll(".flame").forEach(f=>f.classList.remove("on"));
+  });
+  COOK_STEPS.forEach(s=>delete s._partial);
+  buildHotspots();showScene("s-kitchen1");
+  msg("Eksploruj kuchnię – klikaj w szafki, lodówkę i sprzęty!");
+  updateInv();renderBtns();
+}
+
+buildHotspots();updateInv();renderBtns();
+</script>
