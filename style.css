@@ -727,7 +727,26 @@ ul {
   background: rgba(255,255,255,0.03);
   border: 1px dashed rgba(255,255,255,0.12);
 }
+.fragment-box {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 4px solid #007eff; /* Stalowy pasek */
+    padding: 40px;
+    margin: 40px auto;
+    max-width: 800px;
+    border-radius: 0 20px 20px 0;
+}
 
+.fragment-box::before {
+    content: "“";
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    font-size: 10rem;
+    color: #ff0000; /* Resoviacka czerwień */
+    opacity: 0.15;
+    font-family: serif;
+}
 @media (max-width: 700px) {
   .author-card {
     padding: 22px 18px;
