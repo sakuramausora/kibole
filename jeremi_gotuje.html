@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuchenny Koszmar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: #111;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    #game-container {
+      width: 1220px;
+      max-width: calc(100vw - 24px);
+      height: 820px;
+      max-height: calc(100vh - 24px);
+      background: #2c3e50;
+      border: 8px solid #444;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+
+    .stat-box {
+      background: rgba(0,0,0,0.82);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid #f1c40f;
+      font-size: 14px;
+      min-width: 135px;
+      text-align: center;
+    }
+
+    .kitchen {
+      display: grid;
+      grid-template-columns: 290px 1fr 300px;
+      height: 100%;
+      padding-top: 72px;
+    }
+
+    .stove-area, .prep-area, .dining-area {
+      position: relative;
+      padding: 16px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .stove-area {
+      background: #34495e;
+      border-right: 5px solid #222;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .prep-area {
+      background: #546e7a;
+      border-right: 5px solid #222;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .dining-area {
+      background: #4e342e;
+      overflow: hidden;
+    }
+
+    .section-label {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 8px;
+      opacity: 0.95;
+      font-size: 14px;
+    }
+
+    .pan-container, .pot-container {
+      width: 190px;
+      height: 205px;
+      position: relative;
+      text-align: center;
+      flex: 0 0 auto;
+    }
+
+    #kotlet-wrap {
+      width: 150px;
+      margin: 0 auto;
+      transition: transform 0.28s ease, opacity 0.25s ease;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    #kotlet-wrap.flipped { transform: rotateY(180deg); }
+    #kotlet-wrap.removed { opacity: 0.18; pointer-events: none; }
+
+    .btn {
+      background: #e67e22;
+      color: white;
+      padding: 9px 14px;
+      border: none;
+      border-radius: 24px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .btn:hover { background: #d35400; }
+    .btn.small { padding: 7px 12px; font-size: 12px; }
+    .btn.green { background: #27ae60; }
+    .btn.green:hover { background: #1f8b4d; }
+    .btn.blue { background: #2980b9; }
+    .btn.blue:hover { background: #20638f; }
+    .btn.gray { background: #7f8c8d; }
+    .btn.gray:hover { background: #687375; }
+
+    .hidden { display: none !important; }
+
+    .boiling { animation: shake 0.1s infinite; }
+
+    @keyframes shake {
+      0% { transform: translate(1px,1px); }
+      50% { transform: translate(-1px,-1px); }
+      100% { transform: translate(0,0); }
+    }
+
+    .prep-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .station {
+      background: rgba(0,0,0,0.18);
+      border: 3px solid rgba(0,0,0,0.25);
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .storage-box, .cabinet {
+      height: 72px;
+      border-radius: 10px;
+      border: 3px solid #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: bold;
+      line-height: 1.2;
+      padding: 8px;
+    }
+
+    .storage-box.fridge {
+      background: #b0bec5;
+      color: #111;
+    }
+
+    .storage-box.spice-cabinet {
+      background: #6d4c41;
+    }
+
+    .storage-items {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ingredient-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 2px solid rgba(0,0,0,0.35);
+      background: rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    .ingredient-btn:hover { transform: scale(1.06); }
+    .ingredient-btn.taken { opacity: 0.35; filter: grayscale(0.8); }
+
+    .mini-status {
+      margin-top: 8px;
+      min-height: 20px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.92;
+    }
+
+    .prep-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .knife-board {
+      width: 100%;
+      height: 88px;
+      background: #a1887f;
+      border: 3px solid #6d4c41;
+      border-radius: 12px;
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .peeled-cucumber-visual, .unpeeled-cucumber-visual {
+      position: absolute;
+      top: 30px;
+      width: 82px;
+      height: 22px;
+      border-radius: 20px;
+    }
+
+    .unpeeled-cucumber-visual {
+      left: 20px;
+      background: linear-gradient(to right, #2e7d32, #66bb6a);
+      border: 2px solid #1b5e20;
+    }
+
+    .peeled-cucumber-visual {
+      right: 20px;
+      background: linear-gradient(to right, #b8e994, #dff9c7);
+      border: 2px solid #8fbf61;
+    }
+
+    .counter-station {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .countertop {
+      width: 100%;
+      min-height: 150px;
+      background: #8d6e63;
+      border: 3px solid #5d4037;
+      border-radius: 12px;
+      position: relative;
+      padding: 10px;
+    }
+
+    .counter-items {
+      position: relative;
+      min-height: 124px;
+    }
+
+    .counter-item {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.18);
+      border: 2px solid rgba(0,0,0,0.35);
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: grab;
+      z-index: 30;
+      touch-action: none;
+    }
+
+    .counter-item.dragging {
+      cursor: grabbing;
+      transform: scale(1.08);
+      z-index: 50;
+    }
+
+    .counter-item svg {
+      display: block;
+      width: 38px;
+      height: 38px;
+      pointer-events: none;
+    }
+
+    .bowl-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+
+    .bowl {
+      width: 220px;
+      height: 120px;
+      background: linear-gradient(to bottom, #dfe6e9 0%, #b2bec3 100%);
+      border: 4px solid #7f8c8d;
+      border-radius: 0 0 110px 110px / 0 0 80px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bowl.drop-ready {
+      box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.4);
+    }
+
+    .bowl-ingredient {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.9;
+    }
+
+    .cucumber-slice {
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle, #dff5d8 0 45%, #6ab04c 46% 100%);
+      border: 2px solid #4d8f39;
+    }
+
+    .cream-dollop {
+      width: 32px;
+      height: 18px;
+      background: #fffdf5;
+      border: 1px solid #ddd8c8;
+      border-radius: 50%;
+    }
+
+    .salt-dot {
+      width: 7px;
+      height: 7px;
+      background: #fafafa;
+    }
+
+    .pepper-dot {
+      width: 6px;
+      height: 6px;
+      background: #2d3436;
+    }
+
+    .table {
+      width: 280px;
+      height: 192px;
+      background: #795548;
+      border-radius: 50%;
+      position: absolute;
+      top: 44%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #5d4037;
+    }
+
+    .plate-slot {
+      width: 68px;
+      height: 68px;
+      border: 2px dashed rgba(255,255,255,0.24);
+      border-radius: 50%;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .plate {
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      position: absolute;
+      cursor: grab;
+      z-index: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      touch-action: none;
+    }
+
+    .plate.dragging { cursor: grabbing; transform: scale(1.06); }
+
+    .plate.contaminated {
+      background: radial-gradient(circle at 50% 50%, #fff 0 55%, #d7ffd7 56% 100%);
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.35), 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .cabinet {
+      background: #3e2723;
+      width: 145px;
+      position: absolute;
+      left: 12px;
+      bottom: 14px;
+    }
+
+    #mucha {
+      position: absolute;
+      font-size: 30px;
+      z-index: 2200;
+      cursor: crosshair;
+      display: none;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    #alarm-indicator, #kotlet-indicator {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200;
+      border: 2px solid #ffdfdf;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      display: none;
+    }
+
+    #alarm-indicator {
+      top: 88px;
+      background: rgba(192, 57, 43, 0.92);
+    }
+
+    #kotlet-indicator {
+      top: 136px;
+      background: rgba(230, 126, 34, 0.94);
+    }
+
+    #fire-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2500;
+      background: rgba(255,0,0,0);
+      transition: background 0.25s;
+    }
+
+    #jeremi-panel {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      width: 165px;
+      min-height: 92px;
+      background: rgba(0,0,0,0.78);
+      border: 2px solid #f1c40f;
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      z-index: 900;
+      pointer-events: none;
+    }
+
+    #jeremi-img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    #jeremi-text {
+      font-size: 11px;
+      line-height: 1.15;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .screen h1, .screen h2, .screen p { margin-bottom: 12px; }
+
+    .screen ul {
+      margin: 12px 0 0;
+      text-align: left;
+      max-width: 760px;
+      line-height: 1.45;
+    }
+
+    .screen li { margin-bottom: 6px; }
+
+    @media (max-width: 1120px) {
+      .kitchen { grid-template-columns: 270px 1fr 285px; }
+    }
+  </style>
+</head>
+<body>
+<div id="game-container">
+  <div id="fire-overlay"></div>
+  <div id="alarm-indicator">ALARM! MASZ 5 SEKUND NA ODCEDZENIE!</div>
+  <div id="kotlet-indicator">KOTLET GOTOWY — ZDEJMIJ Z PATELNI!</div>
+  <div id="mucha">🪰</div>
+
+  <div class="hud">
+    <div class="stat-box">CZAS DO GOŚCI: <span id="timer">60</span>s</div>
+    <div class="stat-box">NA STOLE: <span id="table-count">0</span>/4</div>
+    <div class="stat-box">DOBRE TALERZE: <span id="good-plates">8</span>/8</div>
+    <div class="stat-box">MIZERIA: <span id="salad-status">NIE</span></div>
+    <div class="stat-box">STATUS: <span id="status-text">PRZYGOTOWANIA</span></div>
+  </div>
+
+  <div class="kitchen">
+    <div class="stove-area">
+      <div class="pan-container">
+        <div class="section-label">KOTLET</div>
+        <div id="kotlet-wrap" title="Kliknij, aby obrócić kotlet">
+          <svg viewBox="0 0 200 200" width="150" aria-label="patelnia">
+            <circle cx="100" cy="100" r="80" fill="#222"></circle>
+            <path id="kotlet" d="M60,100 Q50,70 90,60 T140,90 T100,140 T60,100" fill="#d08a3c"></path>
+          </svg>
+        </div>
+        <button id="flip-btn" class="btn small">OBRÓĆ KOTLET</button>
+        <button id="remove-btn" class="btn small green hidden">ZDEJMIJ Z PATELNI</button>
+      </div>
+
+      <div class="pot-container" id="pot-zone">
+        <div class="section-label">ZIEMNIAKI</div>
+        <svg viewBox="0 0 200 200" width="140" aria-label="garnek">
+          <rect x="50" y="70" width="100" height="80" fill="#95a5a6"></rect>
+          <rect x="40" y="60" width="120" height="10" fill="#bdc3c7"></rect>
+        </svg>
+        <button id="drain-btn" class="btn small blue hidden">ODCEDŹ</button>
+      </div>
+
+      <div id="jeremi-panel">
+        <img id="jeremi-img" src="jeremi-normalny.jpg" alt="Jeremi" />
+        <div id="jeremi-text">No, może jeszcze da się to uratować...</div>
+      </div>
+    </div>
+
+    <div class="prep-area">
+      <div class="prep-top">
+        <div class="station">
+          <div class="section-label">LODÓWKA</div>
+          <div class="storage-box fridge">🧊 LODÓWKA</div>
+          <div class="storage-items">
+            <div id="take-cucumber" class="ingredient-btn" title="Weź ogórki">🥒</div>
+            <div id="take-cream" class="ingredient-btn" title="Weź śmietanę">🥛</div>
+            <div class="ingredient-btn fake-food" data-kind="tomato" title="Weź">🍅</div>
+            <div class="ingredient-btn fake-food" data-kind="juice" title="Weź">🧃</div>
+            <div class="ingredient-btn fake-food" data-kind="butter" title="Weź">🧈</div>
+          </div>
+          <div class="mini-status" id="fridge-note"></div>
+        </div>
+
+        <div class="station">
+          <div class="section-label">PRZYPRAWY</div>
+          <div class="storage-box spice-cabinet">🧂 SZAFKA</div>
+          <div class="storage-items">
+            <div id="take-salt" class="ingredient-btn" title="Weź sól">🧂</div>
+            <div id="take-pepper" class="ingredient-btn" title="Weź pieprz">⚫</div>
+          </div>
+          <div class="mini-status" id="spice-note"></div>
+        </div>
+      </div>
+
+      <div class="station">
+        <div class="section-label">PRZYGOTOWANIE OGÓRKÓW</div>
+        <div class="prep-actions">
+          <button id="peel-btn" class="btn gray">OBIERZ 🥒</button>
+          <button id="slice-btn" class="btn gray">POKRÓJ 🥒</button>
+        </div>
+        <div class="knife-board">
+          <div id="unpeeled-visual" class="unpeeled-cucumber-visual hidden"></div>
+          <div id="peeled-visual" class="peeled-cucumber-visual hidden"></div>
+        </div>
+        <div class="mini-status" id="cucumber-status"></div>
+      </div>
+
+      <div class="station counter-station">
+        <div>
+          <div class="section-label">BLAT</div>
+          <div class="countertop">
+            <div class="counter-items" id="counter-items"></div>
+          </div>
+        </div>
+
+        <div class="bowl-side">
+          <div class="section-label">MISKA</div>
+          <div class="bowl" id="bowl"></div>
+          <div class="mini-status" id="bowl-note">Przeciągaj składniki z blatu do miski</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dining-area" id="dining-area">
+      <div class="table" id="table">
+        <div class="plate-slot" style="top:4px; left:106px;"></div>
+        <div class="plate-slot" style="bottom:4px; left:106px;"></div>
+        <div class="plate-slot" style="left:4px; top:58px;"></div>
+        <div class="plate-slot" style="right:4px; top:58px;"></div>
+      </div>
+      <div class="cabinet">SZAFKA<br>TALERZE</div>
+    </div>
+  </div>
+
+  <div id="start-screen" class="screen">
+    <h1>Kuchenny Koszmar</h1>
+    <p>Teraz oprócz obiadu musisz jeszcze zrobić mizerię.</p>
+    <ul>
+      <li>Obróć kotlet we właściwym momencie, a potem zdejmij go z patelni.</li>
+      <li>Po alarmie masz 5 sekund na odcedzenie ziemniaków.</li>
+      <li>Nakryj 4 miejsca przed przyjściem gości.</li>
+      <li>Wyjmuj rzeczy z lodówki i przyprawy, odkładaj je na blat, a potem przeciągaj do miski.</li>
+      <li>Zły składnik dopiero przy misce ujawnia, że nie nadaje się do mizerii.</li>
+      <li>Mucha lata po kuchni i może skazić talerz.</li>
+    </ul>
+    <button class="btn" id="start-btn">START</button>
+  </div>
+
+  <div id="end-screen" class="screen hidden">
+    <h1 id="end-title">KONIEC</h1>
+    <h2 id="end-subtitle"></h2>
+    <button class="btn" onclick="location.reload()">JESZCZE RAZ</button>
+  </div>
+</div>
+
+<script>
+  let gameActive = false;
+  let timeLeft = 60;
+
+  const totalPlates = 8;
+  let brokenPlates = 0;
+  let contaminatedRemoved = 0;
+  let placedGoodPlates = 0;
+  let nextPlateId = 1;
+
+  let activePlate = null;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  let draggedCounterItem = null;
+
+  let kotletHeat = 0;
+  let kotletFlipped = false;
+  let kotletRemoved = false;
+  let kotletReadyWindowOpen = false;
+
+  const kotletFlipMin = 45;
+  const kotletFlipMax = 85;
+  const kotletReadyMin = 118;
+  const kotletReadyMax = 132;
+  const kotletBurnThreshold = 145;
+
+  let alarmTriggered = false;
+  let drainSuccess = false;
+  let potatoDeadlineTimeLeft = null;
+
+  const salad = {
+    cucumberTaken: false,
+    creamTaken: false,
+    saltTaken: false,
+    pepperTaken: false,
+    cucumberPeeled: false,
+    cucumberSliced: false,
+    cucumberAdded: false,
+    creamAdded: false,
+    saltAdded: false,
+    pepperAdded: false,
+    ready: false
+  };
+
+  const counterState = {
+    items: []
+  };
+
+  let fly = {
+    active: false,
+    visible: false,
+    scaredUntil: 0,
+    x: 0, y: 0, vx: 0, vy: 0, driftX: 0, driftY: 0,
+    targetPlateId: null, targetUntil: 0
+  };
+
+  let timerInterval = null;
+  let flyDecisionInterval = null;
+  let flyMoveInterval = null;
+  let audioCtx = null;
+  let jeremiCooldown = null;
+
+  const gameContainer = document.getElementById('game-container');
+  const diningArea = document.getElementById('dining-area');
+  const table = document.getElementById('table');
+  const mucha = document.getElementById('mucha');
+  const fireOverlay = document.getElementById('fire-overlay');
+  const alarmIndicator = document.getElementById('alarm-indicator');
+  const kotletIndicator = document.getElementById('kotlet-indicator');
+  const statusText = document.getElementById('status-text');
+  const goodPlatesText = document.getElementById('good-plates');
+  const tableCountText = document.getElementById('table-count');
+  const timerText = document.getElementById('timer');
+  const saladStatusText = document.getElementById('salad-status');
+  const kotlet = document.getElementById('kotlet');
+  const kotletWrap = document.getElementById('kotlet-wrap');
+  const drainBtn = document.getElementById('drain-btn');
+  const removeBtn = document.getElementById('remove-btn');
+  const potZone = document.getElementById('pot-zone');
+  const bowl = document.getElementById('bowl');
+  const counterItemsEl = document.getElementById('counter-items');
+
+  const takeCucumberBtn = document.getElementById('take-cucumber');
+  const takeCreamBtn = document.getElementById('take-cream');
+  const takeSaltBtn = document.getElementById('take-salt');
+  const takePepperBtn = document.getElementById('take-pepper');
+
+  function initAudio() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function resumeAudio() {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
+  function playSound(freq, type, duration, volume = 0.08) {
+    if (!audioCtx) return;
+    if (!['sine', 'square', 'triangle', 'sawtooth'].includes(type)) type = 'sine';
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }
+
+  function setJeremi(mood, text) {
+    const img = document.getElementById('jeremi-img');
+    const box = document.getElementById('jeremi-text');
+
+    img.src = mood === 'angry' ? 'jeremi-wkurzony.png' : 'jeremi-normalny.jpg';
+    box.textContent = text;
+
+    if (jeremiCooldown) clearTimeout(jeremiCooldown);
+
+    if (mood === 'angry' && gameActive) {
+      jeremiCooldown = setTimeout(() => {
+        if (!gameActive) return;
+        img.src = 'jeremi-normalny.jpg';
+        box.textContent = 'No, może jeszcze da się to uratować...';
+      }, 2200);
+    }
+  }
+
+  function updateHUD() {
+    timerText.textContent = timeLeft;
+    tableCountText.textContent = placedGoodPlates;
+    goodPlatesText.textContent = getRemainingUsablePlates();
+    saladStatusText.textContent = salad.ready ? 'TAK' : 'NIE';
+  }
+
+  function setStatus(text) {
+    statusText.textContent = text;
+  }
+
+  function setMiniStatus(id, text) {
+    document.getElementById(id).textContent = text;
+  }
+
+  function getRemainingUsablePlates() {
+    return totalPlates - brokenPlates - contaminatedRemoved;
+  }
+
+  function recountTable() {
+    placedGoodPlates = [...document.querySelectorAll('.plate.clean[data-on-table="1"]')].length;
+    updateHUD();
+  }
+
+  function getKotletColorByHeat(heat) {
+    if (heat < 20) return 'rgb(214, 151, 84)';
+    if (heat < 40) return 'rgb(198, 131, 64)';
+    if (heat < 60) return 'rgb(173, 105, 45)';
+    if (heat < 80) return 'rgb(145, 84, 35)';
+    if (heat < 100) return 'rgb(118, 64, 28)';
+    if (heat < 115) return 'rgb(96, 54, 25)';
+    if (heat < 125) return 'rgb(82, 45, 20)';
+    if (heat < 135) return 'rgb(60, 33, 16)';
+    return 'rgb(25, 18, 12)';
+  }
+
+  function setKotletColor() {
+    kotlet.setAttribute('fill', getKotletColorByHeat(kotletHeat));
+  }
+
+  function updateFireVisual() {
+    if (kotletRemoved || kotletHeat < 105) fireOverlay.style.background = 'rgba(255,0,0,0)';
+    else if (kotletHeat < 125) fireOverlay.style.background = 'rgba(255,120,0,0.12)';
+    else if (kotletHeat < 138) fireOverlay.style.background = 'rgba(255,0,0,0.22)';
+    else fireOverlay.style.background = 'rgba(255,0,0,0.36)';
+  }
+
+  function renderSaladUI() {
+    takeCucumberBtn.classList.toggle('taken', salad.cucumberTaken);
+    takeCreamBtn.classList.toggle('taken', salad.creamTaken);
+    takeSaltBtn.classList.toggle('taken', salad.saltTaken);
+    takePepperBtn.classList.toggle('taken', salad.pepperTaken);
+
+    document.getElementById('unpeeled-visual').classList.toggle('hidden', !salad.cucumberTaken || salad.cucumberPeeled);
+    document.getElementById('peeled-visual').classList.toggle('hidden', !salad.cucumberPeeled);
+
+    let cucumberText = 'Etap 🥒: ';
+    if (!salad.cucumberTaken) cucumberText += 'weź';
+    else if (!salad.cucumberPeeled) cucumberText += 'obierz';
+    else if (!salad.cucumberSliced) cucumberText += 'pokrój';
+    else cucumberText += 'gotowe';
+    setMiniStatus('cucumber-status', cucumberText);
+
+    updateBowlVisual();
+    renderCounter();
+    updateHUD();
+  }
+
+  function updateBowlVisual() {
+    bowl.innerHTML = '';
+
+    if (salad.creamAdded) {
+      for (let i = 0; i < 5; i++) {
+        const el = document.createElement('div');
+        el.className = 'bowl-ingredient cream-dollop';
+        el.style.left = (18 + i * 34) + 'px';
+        el.style.top = (64 + (i % 2) * 10) + 'px';
+        bowl.appendChild(el);
+      }
+    }
+
+    if (salad.cucumberAdded) {
+      const positions = [[18,52],[52,44],[86,58],[118,46],[152,56],[66,78],[116,80],[32,78]];
+      positions.forEach(([x, y]) => {
+        const el = document.createElement('div');
+        el.className = 'bowl-ingredient cucumber-slice';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        bowl.appendChild(el);
+      });
+    }
+
+    if (salad.saltAdded) {
+      [[30,36],[66,31],[102,37],[145,30],[185,38],[88,22]].forEach(([x,y]) => {
+        const el = document.createElement('div');
+        el.className = 'bowl-ingredient salt-dot';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        bowl.appendChild(el);
+      });
+    }
+
+    if (salad.pepperAdded) {
+      [[42,25],[78,48],[112,26],[156,42],[190,26],[98,66],[58,62]].forEach(([x,y]) => {
+        const el = document.createElement('div');
+        el.className = 'bowl-ingredient pepper-dot';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        bowl.appendChild(el);
+      });
+    }
+  }
+
+  function addCounterItem(kind, emoji) {
+    if (counterState.items.some(item => item.kind === kind && !item.used)) return;
+
+    const visibleCount = counterState.items.filter(i => !i.used).length;
+    counterState.items.push({
+      id: crypto.randomUUID(),
+      kind,
+      emoji,
+      x: 12 + (visibleCount % 7) * 58,
+      y: 8 + Math.floor(visibleCount / 7) * 58,
+      used: false
+    });
+
+    renderCounter();
+  }
+
+  function renderCounter() {
+    counterItemsEl.innerHTML = '';
+
+    counterState.items.filter(item => !item.used).forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'counter-item';
+      el.dataset.id = item.id;
+      el.style.left = item.x + 'px';
+      el.style.top = item.y + 'px';
+
+      if (item.kind === 'cucumber') {
+        if (salad.cucumberSliced) {
+          el.innerHTML = `
+            <svg viewBox="0 0 64 64" aria-label="pokrojony ogórek">
+              <circle cx="20" cy="22" r="10" fill="#dff5d8" stroke="#4d8f39" stroke-width="3"/>
+              <circle cx="20" cy="22" r="4" fill="#b8e994"/>
+              <circle cx="42" cy="22" r="10" fill="#dff5d8" stroke="#4d8f39" stroke-width="3"/>
+              <circle cx="42" cy="22" r="4" fill="#b8e994"/>
+              <circle cx="31" cy="42" r="10" fill="#dff5d8" stroke="#4d8f39" stroke-width="3"/>
+              <circle cx="31" cy="42" r="4" fill="#b8e994"/>
+            </svg>
+          `;
+        } else if (salad.cucumberPeeled) {
+          el.innerHTML = `
+            <svg viewBox="0 0 64 64" aria-label="obrany ogórek">
+              <rect x="10" y="22" width="44" height="20" rx="10" fill="#dff9c7" stroke="#8fbf61" stroke-width="3"/>
+              <circle cx="16" cy="32" r="10" fill="#dff9c7" stroke="#8fbf61" stroke-width="3"/>
+              <circle cx="48" cy="32" r="10" fill="#dff9c7" stroke="#8fbf61" stroke-width="3"/>
+            </svg>
+          `;
+        } else {
+          el.innerHTML = `
+            <svg viewBox="0 0 64 64" aria-label="ogórek">
+              <rect x="10" y="22" width="44" height="20" rx="10" fill="#66bb6a" stroke="#1b5e20" stroke-width="3"/>
+              <circle cx="16" cy="32" r="10" fill="#4caf50" stroke="#1b5e20" stroke-width="3"/>
+              <circle cx="48" cy="32" r="10" fill="#66bb6a" stroke="#1b5e20" stroke-width="3"/>
+              <path d="M18 26 L46 26 M18 32 L46 32 M18 38 L46 38" stroke="#2e7d32" stroke-width="2" opacity="0.65"/>
+            </svg>
+          `;
+        }
+      } else if (item.kind === 'cream') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="śmietana">
+            <rect x="18" y="12" width="28" height="40" rx="6" fill="#ffffff" stroke="#cfd8dc" stroke-width="3"/>
+            <rect x="18" y="12" width="28" height="10" rx="4" fill="#90caf9"/>
+            <path d="M24 30 Q32 20 40 30 Q36 42 32 46 Q28 42 24 30" fill="#fffdf5" stroke="#d7ccc8" stroke-width="1.5"/>
+          </svg>
+        `;
+      } else if (item.kind === 'salt') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="sól">
+            <rect x="20" y="16" width="24" height="34" rx="6" fill="#eceff1" stroke="#90a4ae" stroke-width="3"/>
+            <rect x="24" y="10" width="16" height="10" rx="3" fill="#b0bec5"/>
+            <circle cx="28" cy="16" r="1.5" fill="#607d8b"/>
+            <circle cx="32" cy="16" r="1.5" fill="#607d8b"/>
+            <circle cx="36" cy="16" r="1.5" fill="#607d8b"/>
+          </svg>
+        `;
+      } else if (item.kind === 'pepper') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="pieprz">
+            <rect x="20" y="18" width="24" height="30" rx="6" fill="#6d4c41" stroke="#3e2723" stroke-width="3"/>
+            <rect x="24" y="10" width="16" height="10" rx="3" fill="#212121"/>
+            <circle cx="32" cy="33" r="6" fill="#8d6e63"/>
+          </svg>
+        `;
+      } else if (item.kind === 'tomato') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="pomidor">
+            <circle cx="32" cy="34" r="16" fill="#e53935" stroke="#b71c1c" stroke-width="3"/>
+            <path d="M32 14 L36 20 L44 18 L40 25 L46 30 L38 30 L32 36 L26 30 L18 30 L24 25 L20 18 L28 20 Z"
+                  fill="#43a047" stroke="#2e7d32" stroke-width="2"/>
+          </svg>
+        `;
+      } else if (item.kind === 'juice') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="sok">
+            <rect x="22" y="12" width="20" height="40" rx="4" fill="#ffcc80" stroke="#ef6c00" stroke-width="3"/>
+            <rect x="26" y="8" width="12" height="8" rx="2" fill="#ffe0b2"/>
+            <path d="M38 8 L46 18" stroke="#f5f5f5" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        `;
+      } else if (item.kind === 'butter') {
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-label="masło">
+            <rect x="14" y="24" width="36" height="20" rx="4" fill="#ffd54f" stroke="#f9a825" stroke-width="3"/>
+            <rect x="10" y="20" width="44" height="10" rx="4" fill="#fff8e1" stroke="#bcaaa4" stroke-width="2"/>
+          </svg>
+        `;
+      } else {
+        el.textContent = item.emoji || '?';
+      }
+
+      el.addEventListener('pointerdown', (e) => startDraggingCounterItem(e, item.id));
+      counterItemsEl.appendChild(el);
+    });
+  }
+
+  function startDraggingCounterItem(e, id) {
+    if (!gameActive) return;
+    resumeAudio();
+
+    const el = e.currentTarget;
+    const item = counterState.items.find(i => i.id === id);
+    if (!item) return;
+
+    const rect = el.getBoundingClientRect();
+    const counterRect = counterItemsEl.getBoundingClientRect();
+
+    draggedCounterItem = {
+      id,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top
+    };
+
+    item.x = rect.left - counterRect.left;
+    item.y = rect.top - counterRect.top;
+
+    el.classList.add('dragging');
+    el.setPointerCapture(e.pointerId);
+  }
+
+  function moveDraggedCounterItem(clientX, clientY) {
+    if (!draggedCounterItem) return;
+
+    const item = counterState.items.find(i => i.id === draggedCounterItem.id);
+    const el = counterItemsEl.querySelector(`[data-id="${draggedCounterItem.id}"]`);
+    const counterRect = counterItemsEl.getBoundingClientRect();
+    if (!item || !el) return;
+
+    let x = clientX - counterRect.left - draggedCounterItem.offsetX;
+    let y = clientY - counterRect.top - draggedCounterItem.offsetY;
+
+    item.x = x;
+    item.y = y;
+
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+  }
+
+  function tryDropCounterItem(clientX, clientY) {
+    if (!draggedCounterItem) return;
+
+    const item = counterState.items.find(i => i.id === draggedCounterItem.id);
+    if (!item) {
+      draggedCounterItem = null;
+      return;
+    }
+
+    const bowlRect = bowl.getBoundingClientRect();
+    const insideBowl =
+      clientX >= bowlRect.left &&
+      clientX <= bowlRect.right &&
+      clientY >= bowlRect.top &&
+      clientY <= bowlRect.bottom;
+
+    const counterRect = counterItemsEl.getBoundingClientRect();
+
+    if (insideBowl) {
+      handleIngredientDrop(item);
+    } else {
+      item.x = Math.max(0, Math.min(counterRect.width - 52, item.x));
+      item.y = Math.max(0, Math.min(counterRect.height - 52, item.y));
+    }
+
+    draggedCounterItem = null;
+    renderCounter();
+  }
+
+  function handleIngredientDrop(item) {
+    const kind = item.kind;
+
+    if (kind === 'cucumber') {
+      if (!salad.cucumberPeeled) {
+        setStatus('Najpierw obierz 🥒');
+        setMiniStatus('bowl-note', 'Surowy ogórek nie trafia do mizerii');
+        playSound(220, 'sawtooth', 0.08, 0.05);
+        return;
+      }
+      if (!salad.cucumberSliced) {
+        setStatus('Najpierw pokrój 🥒');
+        setMiniStatus('bowl-note', 'Cały ogórek nie trafia do mizerii');
+        playSound(220, 'sawtooth', 0.08, 0.05);
+        return;
+      }
+      if (!salad.cucumberAdded) {
+        salad.cucumberAdded = true;
+        item.used = true;
+        setStatus('DODANO 🥒');
+        setMiniStatus('bowl-note', 'Ogórek w misce');
+        playSound(600, 'triangle', 0.08, 0.06);
+      }
+    } else if (kind === 'cream') {
+      if (!salad.creamAdded) {
+        salad.creamAdded = true;
+        item.used = true;
+        setStatus('DODANO 🥛');
+        setMiniStatus('bowl-note', 'Śmietana w misce');
+        playSound(700, 'triangle', 0.08, 0.06);
+      }
+    } else if (kind === 'salt') {
+      if (!salad.saltAdded) {
+        salad.saltAdded = true;
+        item.used = true;
+        setStatus('DODANO 🧂');
+        setMiniStatus('bowl-note', 'Sól w misce');
+        playSound(760, 'triangle', 0.08, 0.06);
+      }
+    } else if (kind === 'pepper') {
+      if (!salad.pepperAdded) {
+        salad.pepperAdded = true;
+        item.used = true;
+        setStatus('DODANO ⚫');
+        setMiniStatus('bowl-note', 'Pieprz w misce');
+        playSound(820, 'triangle', 0.08, 0.06);
+      }
+    } else {
+      setStatus('To nie nadaje się do mizerii');
+      setMiniStatus('bowl-note', 'Zły składnik');
+      playSound(220, 'sawtooth', 0.08, 0.05);
+      return;
+    }
+
+    checkSaladReady();
+  }
+
+  function checkSaladReady() {
+    salad.ready = salad.cucumberAdded && salad.creamAdded && salad.saltAdded && salad.pepperAdded;
+    if (salad.ready) {
+      setStatus('MIZERIA GOTOWA');
+      setMiniStatus('bowl-note', 'Mizeria gotowa');
+    }
+    renderSaladUI();
+  }
+
+  takeCucumberBtn.addEventListener('click', () => {
+    if (!gameActive || salad.cucumberTaken) return;
+    resumeAudio();
+    salad.cucumberTaken = true;
+    addCounterItem('cucumber', '🥒');
+    setStatus('WZIĘTO 🥒');
+    setMiniStatus('fridge-note', 'Ogórek leży na blacie');
+    playSound(520, 'triangle', 0.08, 0.06);
+    renderSaladUI();
+  });
+
+  takeCreamBtn.addEventListener('click', () => {
+    if (!gameActive || salad.creamTaken) return;
+    resumeAudio();
+    salad.creamTaken = true;
+    addCounterItem('cream', '🥛');
+    setStatus('WZIĘTO 🥛');
+    setMiniStatus('fridge-note', 'Śmietana leży na blacie');
+    playSound(560, 'triangle', 0.08, 0.06);
+    renderSaladUI();
+  });
+
+  takeSaltBtn.addEventListener('click', () => {
+    if (!gameActive || salad.saltTaken) return;
+    resumeAudio();
+    salad.saltTaken = true;
+    addCounterItem('salt', '🧂');
+    setStatus('WZIĘTO 🧂');
+    setMiniStatus('spice-note', 'Sól leży na blacie');
+    playSound(610, 'triangle', 0.08, 0.06);
+    renderSaladUI();
+  });
+
+  takePepperBtn.addEventListener('click', () => {
+    if (!gameActive || salad.pepperTaken) return;
+    resumeAudio();
+    salad.pepperTaken = true;
+    addCounterItem('pepper', '⚫');
+    setStatus('WZIĘTO ⚫');
+    setMiniStatus('spice-note', 'Pieprz leży na blacie');
+    playSound(650, 'triangle', 0.08, 0.06);
+    renderSaladUI();
+  });
+
+  document.querySelectorAll('.fake-food').forEach(el => {
+    el.addEventListener('click', () => {
+      if (!gameActive) return;
+      const emoji = el.textContent.trim();
+      const kind = el.dataset.kind;
+      resumeAudio();
+      addCounterItem(kind, emoji);
+      setStatus('Wzięto ' + emoji);
+      setMiniStatus('fridge-note', 'Na blacie pojawiło się ' + emoji);
+      playSound(350, 'triangle', 0.06, 0.05);
+      el.classList.add('taken');
+    });
+  });
+
+  document.getElementById('peel-btn').addEventListener('click', () => {
+    if (!gameActive) return;
+    if (!salad.cucumberTaken) {
+      setStatus('NAJPIERW WEŹ 🥒');
+      return;
+    }
+    if (salad.cucumberPeeled) {
+      setStatus('🥒 JUŻ OBRANE');
+      return;
+    }
+    resumeAudio();
+    salad.cucumberPeeled = true;
+    setStatus('OBRANO 🥒');
+    playSound(430, 'sawtooth', 0.12, 0.05);
+    renderSaladUI();
+  });
+
+  document.getElementById('slice-btn').addEventListener('click', () => {
+    if (!gameActive) return;
+    if (!salad.cucumberPeeled) {
+      setStatus('NAJPIERW OBIERZ 🥒');
+      return;
+    }
+    if (salad.cucumberSliced) {
+      setStatus('🥒 JUŻ POKROJONE');
+      return;
+    }
+    resumeAudio();
+    salad.cucumberSliced = true;
+    setStatus('POKROJONO 🥒');
+    playSound(520, 'sawtooth', 0.09, 0.05);
+    renderSaladUI();
+  });
+
+  function getSpawnablePlateCount() {
+    const loose = [...document.querySelectorAll('.plate.loose')].length;
+    const cleanOnTable = [...document.querySelectorAll('.plate.clean[data-on-table="1"]')].length;
+    const contaminatedOnTable = [...document.querySelectorAll('.plate.contaminated[data-on-table="1"]')].length;
+    return totalPlates - brokenPlates - contaminatedRemoved - loose - cleanOnTable - contaminatedOnTable;
+  }
+
+  function spawnPlate() {
+    if (!gameActive) return;
+    if (getSpawnablePlateCount() <= 0) return;
+    if (document.querySelector('.plate.loose')) return;
+
+    const plate = document.createElement('div');
+    plate.className = 'plate clean loose';
+    plate.dataset.plateId = String(nextPlateId++);
+    plate.dataset.onTable = '0';
+    plate.dataset.slotIndex = '-1';
+    plate.style.left = '26px';
+    plate.style.top = (diningArea.clientHeight - 104) + 'px';
+    diningArea.appendChild(plate);
+    plate.addEventListener('pointerdown', startDraggingPlate);
+  }
+
+  function startDraggingPlate(e) {
+    const plate = e.currentTarget;
+    if (!gameActive) return;
+    resumeAudio();
+
+    if (plate.dataset.onTable === '1') {
+      freeSlot(plate.dataset.slotIndex);
+      plate.dataset.onTable = '0';
+      plate.dataset.slotIndex = '-1';
+      plate.classList.add('loose');
+      diningArea.appendChild(plate);
+      recountTable();
+    }
+
+    activePlate = plate;
+    plate.classList.add('dragging');
+
+    const rect = plate.getBoundingClientRect();
+    const areaRect = diningArea.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    plate.style.left = (rect.left - areaRect.left) + 'px';
+    plate.style.top = (rect.top - areaRect.top) + 'px';
+    plate.setPointerCapture(e.pointerId);
+  }
+
+  function moveActivePlate(clientX, clientY) {
+    if (!activePlate) return;
+    const areaRect = diningArea.getBoundingClientRect();
+    activePlate.style.left = (clientX - areaRect.left - dragOffsetX) + 'px';
+    activePlate.style.top = (clientY - areaRect.top - dragOffsetY) + 'px';
+  }
+
+  function getSlots() {
+    return [...document.querySelectorAll('.plate-slot')];
+  }
+
+  function isPlateCenterInsideTable(plate) {
+    const plateRect = plate.getBoundingClientRect();
+    const tableRect = table.getBoundingClientRect();
+    const cx = plateRect.left + plateRect.width / 2;
+    const cy = plateRect.top + plateRect.height / 2;
+    const tx = tableRect.left + tableRect.width / 2;
+    const ty = tableRect.top + tableRect.height / 2;
+    const rx = tableRect.width / 2;
+    const ry = tableRect.height / 2;
+    const norm = ((cx - tx) ** 2) / (rx ** 2) + ((cy - ty) ** 2) / (ry ** 2);
+    return norm <= 1;
+  }
+
+  function getNearestFreeSlot(plateEl) {
+    const slots = getSlots();
+    const plateRect = plateEl.getBoundingClientRect();
+    let bestSlot = null;
+    let bestDistance = Infinity;
+
+    for (let i = 0; i < slots.length; i++) {
+      const slot = slots[i];
+      if (slot.dataset.occupied === '1') continue;
+      const slotRect = slot.getBoundingClientRect();
+      const slotCenterX = slotRect.left + slotRect.width / 2;
+      const slotCenterY = slotRect.top + slotRect.height / 2;
+      const plateCenterX = plateRect.left + plateRect.width / 2;
+      const plateCenterY = plateRect.top + plateRect.height / 2;
+      const distance = Math.hypot(slotCenterX - plateCenterX, slotCenterY - plateCenterY);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSlot = { slot, index: i };
+      }
+    }
+    return bestDistance < 80 ? bestSlot : null;
+  }
+
+  function occupySlot(index) {
+    const slots = getSlots();
+    if (slots[index]) slots[index].dataset.occupied = '1';
+  }
+
+  function freeSlot(index) {
+    const slots = getSlots();
+    if (slots[index] && index !== '-1') slots[index].dataset.occupied = '0';
+  }
+
+  function placePlateInSlot(plate, slotInfo) {
+    plate.classList.remove('dragging', 'loose');
+    plate.dataset.onTable = '1';
+    plate.dataset.slotIndex = String(slotInfo.index);
+    occupySlot(slotInfo.index);
+
+    const slotRect = slotInfo.slot.getBoundingClientRect();
+    const areaRect = diningArea.getBoundingClientRect();
+    plate.style.left = (slotRect.left - areaRect.left + 4) + 'px';
+    plate.style.top = (slotRect.top - areaRect.top + 4) + 'px';
+
+    recountTable();
+    updateHUD();
+    playSound(480, 'triangle', 0.12, 0.08);
+    spawnPlate();
+  }
+
+  function breakPlate(plate) {
+    if (plate.dataset.slotIndex !== '-1') freeSlot(plate.dataset.slotIndex);
+    brokenPlates++;
+    plate.remove();
+    recountTable();
+    updateHUD();
+    spawnPlate();
+    playSound(140, 'sawtooth', 0.22, 0.10);
+  }
+
+  function contaminatePlate(plate) {
+    if (!plate || !gameActive) return;
+    if (!plate.classList.contains('clean') || plate.classList.contains('contaminated')) return;
+    plate.classList.remove('clean');
+    plate.classList.add('contaminated');
+    recountTable();
+    updateHUD();
+    setStatus('TALERZ SKAŻONY');
+    setJeremi('angry', 'Kurwa, ta mucha!');
+  }
+
+  function checkPlateFailure() {
+    if (getRemainingUsablePlates() < 4) {
+      endGame('BRAK TALERZY', 'Zostało mniej niż 4 nieskażonych i niepotłuczonych talerzy.');
+    }
+  }
+
+  function dropPlate() {
+    if (!activePlate) return;
+    const plate = activePlate;
+    plate.classList.remove('dragging');
+
+    const insideTable = isPlateCenterInsideTable(plate);
+    const slotInfo = getNearestFreeSlot(plate);
+
+    if (!insideTable) {
+      breakPlate(plate);
+      activePlate = null;
+      checkPlateFailure();
+      return;
+    }
+
+    if (plate.classList.contains('contaminated')) {
+      contaminatedRemoved++;
+      if (plate.dataset.slotIndex !== '-1') freeSlot(plate.dataset.slotIndex);
+      plate.remove();
+      updateHUD();
+      spawnPlate();
+      activePlate = null;
+      checkPlateFailure();
+      return;
+    }
+
+    if (slotInfo) {
+      placePlateInSlot(plate, slotInfo);
+    } else {
+      plate.classList.add('loose');
+      plate.dataset.onTable = '0';
+      plate.dataset.slotIndex = '-1';
+    }
+
+    activePlate = null;
+  }
+
+  function initFly() {
+    const rect = gameContainer.getBoundingClientRect();
+    fly.x = rect.width * 0.8;
+    fly.y = rect.height * 0.2;
+    fly.vx = 2 + Math.random() * 2;
+    fly.vy = (Math.random() - 0.5) * 4;
+    fly.active = true;
+    fly.visible = true;
+    mucha.style.display = 'block';
+    renderFly();
+  }
+
+  function assignFlyIntent() {
+    if (!gameActive || Date.now() < fly.scaredUntil) return;
+    const cleanPlatesOnTable = [...document.querySelectorAll('.plate.clean[data-on-table="1"]')];
+    if (!cleanPlatesOnTable.length || Math.random() < 0.72) {
+      fly.targetPlateId = null;
+      return;
+    }
+    const target = cleanPlatesOnTable[Math.floor(Math.random() * cleanPlatesOnTable.length)];
+    fly.targetPlateId = target.dataset.plateId;
+    fly.targetUntil = Date.now() + 1000 + Math.random() * 900;
+  }
+
+  function moveFly() {
+    if (!gameActive || !fly.active) return;
+    const now = Date.now();
+    const rect = gameContainer.getBoundingClientRect();
+
+    if (now < fly.scaredUntil) {
+      if (fly.visible) {
+        fly.visible = false;
+        mucha.style.display = 'none';
+      }
+      fly.x += fly.vx * 1.8;
+      fly.y += fly.vy * 1.8;
+      if (fly.x < -40 || fly.x > rect.width + 40 || fly.y < -40 || fly.y > rect.height + 40) {
+        fly.x = Math.random() * rect.width;
+        fly.y = Math.random() * rect.height * 0.75;
+        fly.vx = (Math.random() - 0.5) * 6;
+        fly.vy = (Math.random() - 0.5) * 6;
+      }
+      return;
+    } else if (!fly.visible) {
+      fly.visible = true;
+      mucha.style.display = 'block';
+    }
+
+    fly.driftX += (Math.random() - 0.5) * 0.7;
+    fly.driftY += (Math.random() - 0.5) * 0.7;
+    fly.driftX *= 0.92;
+    fly.driftY *= 0.92;
+    fly.vx += fly.driftX * 0.12;
+    fly.vy += fly.driftY * 0.12;
+
+    if (fly.targetPlateId) {
+      const targetPlate = document.querySelector(`.plate.clean[data-on-table="1"][data-plate-id="${fly.targetPlateId}"]`);
+      if (!targetPlate) {
+        fly.targetPlateId = null;
+      } else {
+        const pr = targetPlate.getBoundingClientRect();
+        const tx = pr.left - rect.left + pr.width / 2;
+        const ty = pr.top - rect.top + pr.height / 2;
+        const dx = tx - fly.x;
+        const dy = ty - fly.y;
+        const len = Math.hypot(dx, dy) || 1;
+        fly.vx += (dx / len) * 0.18;
+        fly.vy += (dy / len) * 0.18;
+        if (now > fly.targetUntil && len < 24) {
+          contaminatePlate(targetPlate);
+          fly.targetPlateId = null;
+        }
+      }
+    }
+
+    const speed = Math.hypot(fly.vx, fly.vy) || 1;
+    const maxSpeed = fly.targetPlateId ? 4.8 : 5.6;
+    if (speed > maxSpeed) {
+      fly.vx = (fly.vx / speed) * maxSpeed;
+      fly.vy = (fly.vy / speed) * maxSpeed;
+    }
+
+    fly.x += fly.vx;
+    fly.y += fly.vy;
+    if (fly.x < 15 || fly.x > rect.width - 15) fly.vx *= -1;
+    if (fly.y < 15 || fly.y > rect.height - 15) fly.vy *= -1;
+    fly.x = Math.max(15, Math.min(rect.width - 15, fly.x));
+    fly.y = Math.max(15, Math.min(rect.height - 15, fly.y));
+    renderFly();
+  }
+
+  function renderFly() {
+    if (!fly.visible) return;
+    mucha.style.left = fly.x + 'px';
+    mucha.style.top = fly.y + 'px';
+  }
+
+  mucha.addEventListener('pointerdown', () => {
+    if (!gameActive || !fly.visible) return;
+    resumeAudio();
+    fly.targetPlateId = null;
+    fly.scaredUntil = Date.now() + 2500;
+    fly.vx = (Math.random() < 0.5 ? -1 : 1) * (5 + Math.random() * 4);
+    fly.vy = (Math.random() - 0.5) * 8;
+    setStatus('MUCHA ODGONIONA');
+    setJeremi('angry', 'Kurwa, ta mucha!');
+    playSound(820, 'triangle', 0.1, 0.08);
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (gameActive && activePlate) {
+      moveActivePlate(e.clientX, e.clientY);
+    }
+
+    if (gameActive && draggedCounterItem) {
+      moveDraggedCounterItem(e.clientX, e.clientY);
+      const bowlRect = bowl.getBoundingClientRect();
+      const insideBowl =
+        e.clientX >= bowlRect.left &&
+        e.clientX <= bowlRect.right &&
+        e.clientY >= bowlRect.top &&
+        e.clientY <= bowlRect.bottom;
+      bowl.classList.toggle('drop-ready', insideBowl);
+    }
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (gameActive && activePlate) {
+      dropPlate();
+    }
+
+    if (gameActive && draggedCounterItem) {
+      bowl.classList.remove('drop-ready');
+      tryDropCounterItem(e.clientX, e.clientY);
+    }
+  });
+
+  function flipKotlet() {
+    if (!gameActive || kotletFlipped || kotletRemoved) return;
+    resumeAudio();
+
+    if (kotletHeat < kotletFlipMin) {
+      endGame('KOTLET OBRÓCONY ZA WCZEŚNIE', 'Mięso było jeszcze surowe.');
+      return;
+    }
+    if (kotletHeat > kotletFlipMax) {
+      endGame('KOTLET OBRÓCONY ZA PÓŹNO', 'Pierwsza strona była już przeciągnięta.');
+      return;
+    }
+
+    kotletFlipped = true;
+    kotletHeat = Math.max(55, kotletHeat - 10);
+    kotletWrap.classList.add('flipped');
+    setKotletColor();
+    setStatus('KOTLET OBRÓCONY');
+    playSound(420, 'sine', 0.12, 0.08);
+  }
+
+  function removeKotlet() {
+    if (!gameActive || !kotletFlipped || kotletRemoved) return;
+    resumeAudio();
+
+    if (kotletHeat < kotletReadyMin) {
+      endGame('KOTLET ZDJĘTY ZA WCZEŚNIE', 'Po obróceniu nie był jeszcze gotowy.');
+      return;
+    }
+    if (kotletHeat > kotletReadyMax) {
+      endGame('KOTLET ZDJĘTY ZA PÓŹNO', 'Po obróceniu był już za długo na patelni.');
+      return;
+    }
+
+    kotletRemoved = true;
+    kotletIndicator.style.display = 'none';
+    removeBtn.classList.add('hidden');
+    kotletWrap.classList.add('removed');
+    fireOverlay.style.background = 'rgba(255,0,0,0)';
+    setStatus('KOTLET ZDJĘTY');
+    playSound(640, 'triangle', 0.16, 0.09);
+  }
+
+  function triggerPotatoAlarm() {
+    alarmTriggered = true;
+    potatoDeadlineTimeLeft = timeLeft - 5;
+    potZone.classList.add('boiling');
+    drainBtn.classList.remove('hidden');
+    alarmIndicator.style.display = 'block';
+    setStatus('ALARM ZIEMNIAKÓW');
+    playSound(880, 'square', 0.16, 0.08);
+    setTimeout(() => playSound(880, 'square', 0.16, 0.08), 220);
+    setTimeout(() => playSound(880, 'square', 0.16, 0.08), 440);
+  }
+
+  function evaluateEnding() {
+    const reasons = [];
+    if (!drainSuccess) reasons.push('ziemniaki nie zostały odcedzone');
+    if (!kotletRemoved) reasons.push('kotlet nie został poprawnie usmażony i zdjęty');
+    if (placedGoodPlates < 4) reasons.push('stół nie został nakryty');
+    if (!salad.ready) reasons.push('mizeria nie jest gotowa');
+    if (getRemainingUsablePlates() < 4) reasons.push('zostało za mało dobrych talerzy');
+
+    if (reasons.length) endGame('OBIAD SIĘ NIE UDAŁ', reasons.join(', ') + '.');
+    else winGame();
+  }
+
+  function winGame() {
+    finishGame();
+    setJeremi('normal', 'No i elegancko. Jakoś to dowiozłem.');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-title').textContent = 'UDAŁO SIĘ';
+    document.getElementById('end-subtitle').textContent =
+      'Goście przyszli, stół nakryty, ziemniaki odcedzone, kotlet gotowy i mizeria zrobiona.';
+  }
+
+  function endGame(title, subtitle) {
+    finishGame();
+    setJeremi('angry', 'No i pięknie, wszystko się posypało...');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-title').textContent = title;
+    document.getElementById('end-subtitle').textContent = subtitle;
+  }
+
+  function finishGame() {
+    gameActive = false;
+    clearInterval(timerInterval);
+    clearInterval(flyDecisionInterval);
+    clearInterval(flyMoveInterval);
+    mucha.style.display = 'none';
+    alarmIndicator.style.display = 'none';
+    kotletIndicator.style.display = 'none';
+    drainBtn.classList.add('hidden');
+    removeBtn.classList.add('hidden');
+    potZone.classList.remove('boiling');
+    activePlate = null;
+    draggedCounterItem = null;
+    bowl.classList.remove('drop-ready');
+    setStatus('KONIEC');
+  }
+
+  function startGame() {
+    if (gameActive) return;
+    initAudio();
+    resumeAudio();
+    document.getElementById('start-screen').classList.add('hidden');
+    gameActive = true;
+    setStatus('PRZYGOTOWANIA');
+    setJeremi('normal', 'No, może jeszcze da się to uratować...');
+    renderSaladUI();
+    updateHUD();
+    spawnPlate();
+
+    timerInterval = setInterval(() => {
+      if (!gameActive) return;
+      timeLeft--;
+      updateHUD();
+
+      if (!kotletRemoved) {
+        kotletHeat += 5;
+        setKotletColor();
+        updateFireVisual();
+
+        if (kotletHeat >= 115 && kotletHeat < kotletBurnThreshold) {
+          setJeremi('angry', 'Ten jebany kotlet się zaraz spali!');
+        }
+      }
+
+      if (!alarmTriggered && timeLeft === 36) triggerPotatoAlarm();
+
+      if (alarmTriggered && !drainSuccess && timeLeft < potatoDeadlineTimeLeft) {
+        endGame('ZIEMNIAKI ROZGOTOWANE', 'Nie odcedziłeś ich w ciągu 5 sekund od alarmu.');
+        return;
+      }
+
+      if (kotletFlipped && !kotletRemoved) {
+        if (kotletHeat >= kotletReadyMin && kotletHeat <= kotletReadyMax) {
+          if (!kotletReadyWindowOpen) {
+            kotletReadyWindowOpen = true;
+            kotletIndicator.style.display = 'block';
+            removeBtn.classList.remove('hidden');
+            setStatus('KOTLET GOTOWY — ZDEJMIJ');
+          }
+        } else if (kotletHeat > kotletReadyMax) {
+          endGame('KOTLET ZA DŁUGO NA PATELNI', 'Po obróceniu nie zdjąłeś go w odpowiednim momencie.');
+          return;
+        }
+      }
+
+      if (!kotletRemoved && kotletHeat >= kotletBurnThreshold) {
+        endGame('SPALONY KOTLET', 'Kotlet był za długo na ogniu.');
+        return;
+      }
+
+      if (timeLeft <= 0) evaluateEnding();
+    }, 1000);
+
+    flyDecisionInterval = setInterval(assignFlyIntent, 2200);
+    flyMoveInterval = setInterval(moveFly, 40);
+    initFly();
+  }
+
+  drainBtn.addEventListener('click', () => {
+    if (!gameActive || !alarmTriggered || drainSuccess) return;
+    resumeAudio();
+    drainSuccess = true;
+    potZone.classList.remove('boiling');
+    drainBtn.classList.add('hidden');
+    alarmIndicator.style.display = 'none';
+    setStatus('ZIEMNIAKI ODCEDZONE');
+    setJeremi('angry', 'Ała, poparzyłem się tymi ziemniakami!!!');
+    playSound(1000, 'triangle', 0.2, 0.08);
+  });
+
+  function occupySlotsInit() {
+    getSlots().forEach(slot => { slot.dataset.occupied = '0'; });
+  }
+
+  document.getElementById('flip-btn').addEventListener('click', flipKotlet);
+  kotletWrap.addEventListener('click', flipKotlet);
+  removeBtn.addEventListener('click', removeKotlet);
+  document.getElementById('start-btn').addEventListener('click', startGame);
+
+  occupySlotsInit();
+  renderSaladUI();
+  updateHUD();
+  setKotletColor();
+</script>
+</body>
+</html>
