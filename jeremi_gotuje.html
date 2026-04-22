@@ -462,8 +462,8 @@
       position: absolute;
       left: 10px;
       bottom: 10px;
-      width: 165px;
-      min-height: 92px;
+      width: 200px;
+      min-height: 100px;
       background: rgba(0,0,0,0.78);
       border: 2px solid #f1c40f;
       border-radius: 12px;
@@ -476,15 +476,15 @@
     }
 
     #jeremi-img {
-      width: 56px;
-      height: 56px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
       flex: 0 0 auto;
     }
 
     #jeremi-text {
-      font-size: 11px;
-      line-height: 1.15;
+      font-size: 16px;
+      line-height: 1.5;
       color: #fff;
       word-break: break-word;
     }
@@ -1568,7 +1568,7 @@
       return;
     }
     if (kotletHeat > kotletFlipMax) {
-      endGame('KOTLET OBRÓCONY ZA PÓŹNO', 'Pierwsza strona była już przeciągnięta.');
+      endGame('KOTLET OBRÓCONY ZA PÓŹNO', 'Pierwsza strona była już spalona.');
       return;
     }
 
@@ -1658,7 +1658,10 @@
     draggedCounterItem = null;
     bowl.classList.remove('drop-ready');
     setStatus('KONIEC');
-  }
+
+    // Upewnij się, że panel Jeremiego jest widoczny po zakończeniu gry
+    document.getElementById('jeremi-panel').style.display = 'flex';
+}
 
   function startGame() {
     if (gameActive) return;
@@ -1682,7 +1685,7 @@
         setKotletColor();
         updateFireVisual();
 
-        if (kotletHeat >= 115 && kotletHeat < kotletBurnThreshold) {
+        if (kotletHeat >= 110 && kotletHeat < kotletBurnThreshold) {
           setJeremi('angry', 'Ten jebany kotlet się zaraz spali!');
         }
       }
