@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Stary ojciec mocno śpi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; font-family: 'Courier New', monospace; background: #000; }
+
+  #game {
+  position: absolute;
+  width: 1195px;
+  height: 896px;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: top left;
+}
+
+  #bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  #bg.sypialnia  { background-color: #2a1a2e; background-image: url('sypialnia.png'),  linear-gradient(135deg,#2a1a2e,#3d2b4a); }
+  #bg.przedpokoj { background-color: #1a2530; background-image: url('przedpokoj.png'), linear-gradient(135deg,#1a2530,#2b3d4a); }
+  #bg.salon      { background-color: #1e1e10; background-image: url('salon.png'),      linear-gradient(135deg,#1e1e10,#2e2e18); }
+  #bg.klatka     { background-color: #2a2a1a; background-image: url('schody.png'),     linear-gradient(135deg,#2a2a1a,#3d3d2a); }
+
+  #player {
+    position: absolute;
+    width: 110px;
+    height: 300px;
+    background-image: url('jeremi-gacie.png');
+    background-repeat: no-repeat;
+    background-size: 860% 200%;
+    z-index: 10;
+  }
+
+  .item {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    z-index: 9;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .item[data-item="buty"]      { filter: brightness(0.6); }
+  .item[data-item="skarpetki"] { filter: brightness(0.6); }
+  .item[data-item="torba"]     { filter: brightness(0.6); }
+  .item[data-item="decoy1"]     { filter: brightness(0.4); }
+  .item[data-item="bluza"]     { width: 100px; height: 120px; filter: brightness(0.6); }
+
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-8px); }
+  }
+
+  .obstacle {
+    position: absolute;
+    z-index: 5;
+  }
+
+  .door {
+    position: absolute;
+    z-index: 8;
+    background: transparent;
+    border: none;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+  }
+  .door-label {
+    font-size: 11px;
+    color: #ffe0a0;
+    background: rgba(0,0,0,0.65);
+    padding: 2px 6px;
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  #hud {
+    position: absolute;
+    top: 12px; left: 12px;
+    z-index: 100;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #room-name {
+    color: #fff; font-size: 13px;
+    background: rgba(0,0,0,0.6);
+    padding: 5px 10px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  #inventory { display: flex; gap: 6px; flex-wrap: wrap; max-width: 320px; }
+  .inv-slot {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: rgba(0,0,0,0.5);
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+  }
+  .inv-slot.collected { border-color: #ffe0a0; background: rgba(255,224,160,0.15); }
+
+  #dialog {
+    position: absolute; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.88);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #dialog-box {
+    background: #111; border: 2px solid #444; border-radius: 12px;
+    padding: 36px 40px; max-width: 500px; color: #eee; text-align: center;
+  }
+  #dialog-box h2 { font-size: 22px; margin-bottom: 14px; color: #f9e4b7; letter-spacing: 1px; }
+  #dialog-box p  { font-size: 14px; line-height: 1.8; color: #ccc; margin-bottom: 24px; }
+  #dialog-box button {
+    background: #f9e4b7; color: #111; border: none;
+    padding: 12px 32px; font-size: 15px; font-family: inherit;
+    border-radius: 8px; cursor: pointer; font-weight: bold; letter-spacing: 1px;
+    transition: transform 0.1s;
+  }
+  #dialog-box button:hover { transform: scale(1.05); }
+
+  #endscreen {
+    position: absolute; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.92);
+    display: none; align-items: center; justify-content: center;
+  }
+  #endscreen.show { display: flex; }
+  #end-box { text-align: center; color: #fff; animation: fadeIn 1s ease; }
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  #end-box h1 { font-size: 40px; color: #f9e4b7; margin-bottom: 16px; letter-spacing: 3px; }
+  #end-box p  { font-size: 18px; color: #aaa; line-height: 1.9; }
+
+  /* Ekran game over */
+  #gameoverscreen {
+    position: absolute; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.92);
+    display: none; align-items: center; justify-content: center;
+  }
+  #gameoverscreen.show { display: flex; }
+  #gameover-box { text-align: center; color: #fff; animation: fadeIn 0.6s ease; }
+  #gameover-box h1 { font-size: 40px; color: #ff4444; margin-bottom: 16px; letter-spacing: 3px; }
+  #gameover-box p  { font-size: 18px; color: #aaa; line-height: 1.9; margin-bottom: 28px; }
+  #gameover-box button {
+    background: #ff4444; color: #fff; border: none;
+    padding: 12px 32px; font-size: 15px; font-family: inherit;
+    border-radius: 8px; cursor: pointer; font-weight: bold; letter-spacing: 1px;
+    transition: transform 0.1s;
+  }
+  #gameover-box button:hover { transform: scale(1.05); }
+
+  #pickup-msg {
+    position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+    z-index: 150; background: rgba(0,0,0,0.75); color: #f9e4b7;
+    padding: 8px 20px; border-radius: 8px; font-size: 14px;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+    border: 1px solid rgba(249,228,183,0.4);
+  }
+  #pickup-msg.show { opacity: 1; }
+
+  #door-hint {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 150; background: rgba(0,0,0,0.75); color: #ffe0a0;
+    padding: 7px 18px; border-radius: 8px; font-size: 13px;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+    border: 1px solid rgba(255,224,160,0.35);
+  }
+  #door-hint.show { opacity: 1; }
+
+  /* Podpowiedź o przedmiocie w pobliżu */
+  #item-hint {
+    position: absolute; bottom: 54px; left: 50%; transform: translateX(-50%);
+    z-index: 150; background: rgba(0,0,0,0.75); color: #a0ffb0;
+    padding: 7px 18px; border-radius: 8px; font-size: 13px;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+    border: 1px solid rgba(160,255,176,0.35);
+  }
+  #item-hint.show { opacity: 1; }
+
+  #fade {
+    position: absolute; inset: 0; z-index: 190;
+    background: #000; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  #fade.dark { opacity: 1; pointer-events: all; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="bg" class="sypialnia"></div>
+  <div id="player"></div>
+  <div id="fade"></div>
+
+  <div id="hud">
+    <div id="room-name">🛏️ Sypialnia</div>
+    <div id="inventory"></div>
+  </div>
+
+  <div id="pickup-msg"></div>
+  <div id="door-hint"></div>
+  <div id="item-hint"></div>
+
+  <div id="dialog">
+    <div id="dialog-box">
+      <h2>Stary ojciec mocno śpi</h2>
+      <p>
+        Gabriela i Jeremiego poniosło wczoraj uczucie. Niestety, w nocy do domu wrócił Jerzy, który zabronił im przecież wspólnego nocowania...<br>
+        Zbierz swoje rzeczy z różnych pokojów i wyjdź po cichu.<br><br>
+        <b>Strzałki / WASD</b> — ruch &nbsp;|&nbsp; <b>E / Enter</b> — otwórz drzwi / zbierz przedmiot<br>
+        <b style="color:#ff8888">Uważaj na nieznajome rzeczy — obudzisz ojca!</b>
+      </p>
+      <button onclick="startGame()">▶ Zacznij</button>
+    </div>
+  </div>
+
+  <div id="endscreen">
+    <div id="end-box">
+      <h1>UCIEKŁEŚ!</h1>
+      <p>
+        Jeremi wychodzi cicho na klatkę schodową.<br>
+        Drzwi zamykają się bezszelestnie.<br><br>
+        <em>Jerzy nigdy się nie dowiedział.</em>
+      </p>
+    </div>
+  </div>
+
+  <div id="gameoverscreen">
+    <div id="gameover-box">
+      <h1>WPADKA!</h1>
+      <p id="gameover-msg">
+        Jeremi wpadł w kartony jak Hanka...<br>
+        Jerzy się obudził!<br><br>
+        <em>— CO TY TU ROBISZ?!</em>
+      </p>
+      <button onclick="restartGame()">↩ Spróbuj ponownie</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  MAPA POKOJÓW
+// ═══════════════════════════════════════════════════════
+
+const DOOR_DIST = 110;
+const ITEM_PICKUP_DIST = 80; // zasięg zbierania (w px od środka przedmiotu)
+
+const ROOMS = {
+
+  sypialnia: {
+    name: "🛏️ Sypialnia",
+    bg: "sypialnia",
+    playerStart: { x:900, y:380 },
+    obstacles: [
+      { x:0, y:0, w:270, h:670 },
+      { x:280, y:370, w:280, h:300 },
+      { x:280, y:0, w:400, h:330 },
+    ],
+    items: [
+      { id:"spodnie",   x:900, y:330, label:"Spodnie"   },
+      { id:"koszulka",  x:560, y:370, label:"Koszulka"  },
+    ],
+    doors: [
+      {
+        id:"sypialnia_przedpokoj",
+        rect:{ x:750, y:100, w:125, h:250 },
+        label:"Przedpokój →",
+        target:"przedpokoj",
+        playerArrival:{ x:185, y:360 },
+      }
+    ]
+  },
+
+  przedpokoj: {
+    name: "🚪 Przedpokój",
+    bg: "przedpokoj",
+    playerStart: { x:185, y:360 },
+    obstacles: [
+      { x:0, y:0, w:1195, h:580 },
+    ],
+    items: [
+      { id:"buty", x:400, y:560, label:"Buty" },
+            { id:"decoy1", x:500, y:660, label:"❓ Co to?", isDecoy: true },
+    ],
+    doors: [
+      {
+        id:"przedpokoj_sypialnia",
+        rect:{ x:100, y:500, w:150, h:470 },
+        label:"← Sypialnia",
+        target:"sypialnia",
+        playerArrival:{ x:750, y:0 },
+      },
+      {
+        id:"przedpokoj_salon",
+        rect:{ x:900, y:530, w:150, h:470 },
+        label:"Salon →",
+        target:"salon",
+        playerArrival:{ x:85, y:560 },
+      },
+      {
+        id:"przedpokoj_wyjscie",
+        rect:{ x:580, y:350, w:130, h:450 },
+        label:"↑ Wyjście z mieszkania",
+        target:"klatka",
+        playerArrival:{ x:500, y:400 },
+        requireAll: true,
+      },
+    ]
+  },
+
+  salon: {
+    name: "🛋️ Salon",
+    bg: "salon",
+    playerStart: { x:185, y:360 },
+    obstacles: [
+      { x:0, y:0, w:900, h:715 },
+    ],
+    items: [
+      { id:"bluza",     x:360, y:560, label:"Bluza"     },
+      { id:"skarpetki", x:750, y:700, label:"Skarpetki" },
+      { id:"torba",     x:900, y:800, label:"Torba"     },
+    ],
+    doors: [
+      {
+        id:"salon_przedpokoj",
+        rect:{ x:150, y:600, w:125, h:370 },
+        label:"← Przedpokój",
+        target:"przedpokoj",
+        playerArrival:{ x:1190, y:410 },
+      },
+    ]
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+//  STAN GRY
+// ═══════════════════════════════════════════════════════
+
+const REQUIRED = ["spodnie","koszulka","bluza","skarpetki","buty","torba"];
+const itemEmoji = {
+  spodnie:"👖", koszulka:"👕", bluza:"🧥",
+  skarpetki:"🧦", buty:"👟", torba:"🎒",
+  decoy1:"❓", decoy2:"❓"
+};
+const itemNames = {
+  spodnie:"Spodnie", koszulka:"Koszulka", bluza:"Bluza",
+  skarpetki:"Skarpetki", buty:"Buty", torba:"Torba",
+  decoy1:"Jakiś śmieć", decoy2:"Jakiś śmieć"
+};
+
+let collected = {};
+let initialCollected = {};
+
+function resetCollected() {
+  collected = {};
+  [...REQUIRED, "decoy1", "decoy2"].forEach(id => collected[id] = false);
+}
+
+let currentRoom   = "sypialnia";
+let gameRunning   = false;
+let transitioning = false;
+let keys          = {};
+let nearDoor      = null;
+let nearItem      = null; // przedmiot w zasięgu (do zbierania przez E)
+const SPEED       = 3;
+let frame = 0, frameTick = 0, direction = 0;
+
+let activeObstacles = [];
+let activeDoors     = [];
+
+let pickupTimer = null;
+
+const playerEl  = document.getElementById("player");
+const bgEl      = document.getElementById("bg");
+const fadeEl    = document.getElementById("fade");
+const pickupMsg = document.getElementById("pickup-msg");
+const doorHint  = document.getElementById("door-hint");
+const itemHint  = document.getElementById("item-hint");
+
+// ═══════════════════════════════════════════════════════
+//  BUDOWANIE POKOJU
+// ═══════════════════════════════════════════════════════
+
+function buildRoom(roomId, arrival) {
+  const room = ROOMS[roomId];
+  bgEl.className = room.bg;
+  document.getElementById("room-name").textContent = room.name;
+  document.querySelectorAll(".obstacle,.item,.door").forEach(e => e.remove());
+  activeObstacles = [];
+  activeDoors     = [];
+  nearDoor        = null;
+  nearItem        = null;
+  doorHint.classList.remove("show");
+  itemHint.classList.remove("show");
+
+  const game = document.getElementById("game");
+
+  room.obstacles.forEach(o => {
+    const el = document.createElement("div");
+    el.className = "obstacle";
+    el.style.cssText = `left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px`;
+    game.appendChild(el);
+    activeObstacles.push(o);
+  });
+
+  room.items.forEach(it => {
+    if (collected[it.id]) return;
+    const el = document.createElement("div");
+    el.className = "item";
+    el.dataset.item = it.id;
+    if (it.isDecoy) el.dataset.decoy = "true";
+    el.style.cssText = `left:${it.x}px; top:${it.y}px; background-image:url('${it.id}.png');`;
+    game.appendChild(el);
+  });
+
+  room.doors.forEach(d => {
+    const r = d.rect;
+    const el = document.createElement("div");
+    el.className = "door";
+    el.id = d.id;
+    el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px`;
+    const lbl = document.createElement("div");
+    lbl.className = "door-label";
+    lbl.textContent = d.label;
+    el.appendChild(lbl);
+    game.appendChild(el);
+    activeDoors.push(d);
+  });
+
+  const pos = arrival || room.playerStart;
+  playerEl.style.left = pos.x + "px";
+  playerEl.style.top  = pos.y + "px";
+  currentRoom = roomId;
+  updateInventoryHUD();
+}
+
+// ═══════════════════════════════════════════════════════
+//  START / RESTART
+// ═══════════════════════════════════════════════════════
+
+function startGame() {
+  document.getElementById("dialog").style.display = "none";
+  resetCollected();
+  buildInventoryHUD();
+  buildRoom("sypialnia");
+  gameRunning = true;
+}
+
+function restartGame() {
+  document.getElementById("gameoverscreen").classList.remove("show");
+  playerEl.style.display = "";
+  resetCollected();
+  updateInventoryHUD();
+  buildRoom("sypialnia");
+  transitioning = false;
+  gameRunning = true;
+}
+
+// ═══════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════
+
+function buildInventoryHUD() {
+  const inv = document.getElementById("inventory");
+  inv.innerHTML = "";
+  REQUIRED.forEach(id => {
+    const s = document.createElement("div");
+    s.className = "inv-slot";
+    s.id = "slot-" + id;
+    s.title = itemNames[id];
+    s.textContent = itemEmoji[id];
+    inv.appendChild(s);
+  });
+}
+
+function updateInventoryHUD() {
+  REQUIRED.forEach(id => {
+    const s = document.getElementById("slot-" + id);
+    if (s) s.classList.toggle("collected", !!collected[id]);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  KOLIZJE
+// ═══════════════════════════════════════════════════════
+
+function collides(nx, ny) {
+  const HW = 50, HH = 28;
+  const cx = nx + 60;
+  const cy = ny + 270;
+  for (const o of activeObstacles) {
+    if (cx-HW < o.x+o.w && cx+HW > o.x && cy-HH < o.y+o.h && cy+HH > o.y) return true;
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRZWI
+// ═══════════════════════════════════════════════════════
+
+function checkNearDoor() {
+  const cx = playerEl.offsetLeft + 80;
+  const cy = playerEl.offsetTop  + 290;
+
+  let found = null;
+  for (const d of activeDoors) {
+    const r = d.rect;
+    const dcx = r.x + r.w/2;
+    const dcy = r.y + r.h/2;
+    if (Math.hypot(cx-dcx, cy-dcy) < DOOR_DIST) { found = d; break; }
+  }
+
+  activeDoors.forEach(d => {
+    const el = document.getElementById(d.id);
+    if (el) el.classList.toggle("near", d === found);
+  });
+
+  nearDoor = found;
+
+  if (found && !nearItem) {
+    const blocked = found.requireAll && !allCollected();
+    doorHint.textContent = blocked
+      ? "Najpierw zbierz wszystkie rzeczy!"
+      : `E / Enter → ${found.label}`;
+    doorHint.classList.add("show");
+  } else if (!found) {
+    doorHint.classList.remove("show");
+  }
+}
+
+function tryOpenDoor() {
+  if (!nearDoor || transitioning) return;
+  if (nearDoor.requireAll && !allCollected()) return;
+  if (nearDoor.target === "klatka") { triggerEnding(); return; }
+  goToRoom(nearDoor.target, nearDoor.playerArrival);
+}
+
+function goToRoom(roomId, arrival) {
+  transitioning = true;
+  fadeEl.classList.add("dark");
+  setTimeout(() => {
+    buildRoom(roomId, arrival);
+    fadeEl.classList.remove("dark");
+    setTimeout(() => { transitioning = false; }, 320);
+  }, 280);
+}
+
+// ═══════════════════════════════════════════════════════
+//  PRZEDMIOTY — sprawdzanie pobliskich
+// ═══════════════════════════════════════════════════════
+
+function checkItems() {
+  const cx = playerEl.offsetLeft + 55;  // środek sprite'a poziomo
+  const cy = playerEl.offsetTop  + 200; // okolice pasa
+
+  let foundItem = null;
+
+  document.querySelectorAll(".item").forEach(el => {
+    const ix = parseFloat(el.style.left) + 40;
+    const iy = parseFloat(el.style.top)  + 40;
+    const dist = Math.hypot(cx - ix, cy - iy);
+
+    const id = el.dataset.item;
+    const isDecoy = el.dataset.decoy === "true";
+
+    if (dist < ITEM_PICKUP_DIST) {
+      // Decoy: game over od razu przy dotknięciu
+      if (isDecoy && !collected[id]) {
+        triggerGameOver();
+        return;
+      }
+      // Zwykły przedmiot: podświetl i zapamiętaj jako "nearItem"
+      if (!collected[id]) {
+        el.classList.add("nearby");
+        foundItem = { el, id };
+      }
+    } else {
+      el.classList.remove("nearby");
+    }
+  });
+
+  nearItem = foundItem;
+
+  // Pokaż podpowiedź o zbieraniu
+  if (foundItem) {
+    itemHint.textContent = `E / Enter → Zbierz: ${itemNames[foundItem.id] || foundItem.id}`;
+    itemHint.classList.add("show");
+    // Schowaj podpowiedź drzwi gdy przedmiot w pobliżu
+    doorHint.classList.remove("show");
+  } else {
+    itemHint.classList.remove("show");
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  ZBIERANIE PRZEZ E/ENTER
+// ═══════════════════════════════════════════════════════
+
+function tryPickupItem() {
+  if (!nearItem || transitioning) return;
+  const { el, id } = nearItem;
+  if (collected[id]) return;
+
+  collected[id] = true;
+  el.classList.remove("nearby");
+  el.remove();
+  nearItem = null;
+  itemHint.classList.remove("show");
+  updateInventoryHUD();
+  updateSprite();
+  showPickup(itemEmoji[id] + " Zebrano: " + itemNames[id]);
+}
+
+function allCollected() { return REQUIRED.every(id => collected[id]); }
+
+function showPickup(text) {
+  pickupMsg.textContent = text;
+  pickupMsg.classList.add("show");
+  clearTimeout(pickupTimer);
+  pickupTimer = setTimeout(() => pickupMsg.classList.remove("show"), 1800);
+}
+
+// ═══════════════════════════════════════════════════════
+//  GAME OVER (decoy)
+// ═══════════════════════════════════════════════════════
+
+function triggerGameOver() {
+  if (transitioning) return;
+  gameRunning = false;
+  transitioning = true;
+  fadeEl.classList.add("dark");
+  setTimeout(() => {
+    fadeEl.classList.remove("dark");
+    document.getElementById("gameoverscreen").classList.add("show");
+  }, 400);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ZAKOŃCZENIE (wygrana)
+// ═══════════════════════════════════════════════════════
+
+function triggerEnding() {
+  transitioning = true;
+  fadeEl.classList.add("dark");
+  setTimeout(() => {
+    bgEl.className = "klatka";
+    playerEl.style.display = "none";
+    document.querySelectorAll(".obstacle,.item,.door").forEach(e => e.remove());
+    doorHint.classList.remove("show");
+    itemHint.classList.remove("show");
+    fadeEl.classList.remove("dark");
+    setTimeout(() => {
+      document.getElementById("endscreen").classList.add("show");
+    }, 900);
+  }, 450);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPRITE
+// ═══════════════════════════════════════════════════════
+
+function animateSprite(moving) {
+  if (moving) {
+    frameTick++;
+    if (frameTick > 8) {
+      frame = (frame + 1) % ((direction===0||direction===3) ? 2 : 4);
+      frameTick = 0;
+    }
+  } else { frame = 0; }
+
+  let x, y;
+  if      (direction===0) { x=[58,72][frame]??58;             y=0;   }
+  else if (direction===1) { x=[2,15,72,58][frame]??2;         y=100; }
+  else if (direction===2) { x=[28,41,84,98][frame]??28;       y=100; }
+  else                    { x=[2,28][frame]??2;                y=0;   }
+  playerEl.style.backgroundPosition = `${x}% ${y}%`;
+}
+
+function updateSprite() {
+  const ORDER = ["spodnie","koszulka","bluza","skarpetki","buty","torba"];
+  let progress = 0;
+  for (const id of ORDER) { if (collected[id]) progress++; else break; }
+  const sprites = [
+    "jeremi-gacie.png","jeremi-spodnie.png","jeremi-koszulka.png",
+    "jeremi-bluza.png","jeremi-skarpetki.png","jeremi-buty.png","jeremi-torba.png"
+  ];
+  playerEl.style.backgroundImage = `url('${sprites[Math.min(progress,6)]}')`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════
+
+document.addEventListener("keydown", e => {
+  keys[e.key] = true;
+  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
+  if (!gameRunning) return;
+  if (e.key==="e" || e.key==="E" || e.key==="Enter") {
+    // Priorytet: zbieranie przedmiotu > otwieranie drzwi
+    if (nearItem) {
+      tryPickupItem();
+    } else {
+      tryOpenDoor();
+    }
+  }
+});
+document.addEventListener("keyup", e => { keys[e.key] = false; });
+
+// ═══════════════════════════════════════════════════════
+//  PĘTLA
+// ═══════════════════════════════════════════════════════
+
+function update() {
+  requestAnimationFrame(update);
+  if (!gameRunning || transitioning) return;
+
+  let x = playerEl.offsetLeft;
+  let y = playerEl.offsetTop;
+  let moving = false;
+  let dx=0, dy=0;
+
+  if (keys["ArrowUp"]   ||keys["w"]) { dy=-SPEED; direction=3; moving=true; }
+  if (keys["ArrowDown"] ||keys["s"]) { dy= SPEED; direction=0; moving=true; }
+  if (keys["ArrowLeft"] ||keys["a"]) { dx=-SPEED; direction=1; moving=true; }
+  if (keys["ArrowRight"]||keys["d"]) { dx= SPEED; direction=2; moving=true; }
+
+  if (dx && !collides(x+dx, y)) x += dx;
+  if (dy && !collides(x, y+dy)) y += dy;
+
+  const PLAYER_W = 110;
+  const PLAYER_H = 300;
+  const LEFT_WALL  = 180;
+  const RIGHT_WALL = 180;
+  const TOP_WALL   = 0;
+  const BOTTOM_LIN = 0;
+  const MIN_X = LEFT_WALL;
+  const MAX_X = 1195 - RIGHT_WALL - PLAYER_W;
+  const MIN_Y = TOP_WALL;
+  const MAX_Y = 896 - BOTTOM_LIN - PLAYER_H;
+
+  x = Math.max(MIN_X, Math.min(MAX_X, x));
+  y = Math.max(MIN_Y, Math.min(MAX_Y, y));
+
+  playerEl.style.left = x+"px";
+  playerEl.style.top  = y+"px";
+
+  animateSprite(moving);
+  checkItems();
+  checkNearDoor();
+}
+
+update();
+
+function scaleGame() {
+  const baseW = 1195;
+  const baseH = 896;
+  const scaleX = window.innerWidth / baseW;
+  const scaleY = window.innerHeight / baseH;
+  const scale = Math.min(scaleX, scaleY);
+  const game = document.getElementById("game");
+  game.style.transform = `translate(-50%, -50%) scale(${scale})`;
+}
+
+window.addEventListener("resize", scaleGame);
+scaleGame();
+</script>
+</body>
+</html>
