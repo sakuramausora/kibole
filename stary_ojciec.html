@@ -51,7 +51,7 @@
   }
   .item[data-item="buty"]      { filter: brightness(0.6); }
   .item[data-item="skarpetki"] { filter: brightness(0.6); }
-  .item[data-item="torba"]     { filter: brightness(0.6); }
+  .item[data-item="torba"]     { filter: brightness(0.4); }
   .item[data-item="decoy1"]     { filter: brightness(0.4); }
   .item[data-item="bluza"]     { filter: brightness(0.6); }
 
@@ -327,7 +327,7 @@ const ROOMS = {
       { x:0, y:0, w:900, h:715 },
     ],
     items: [
-      { id:"bluza",     x:360, y:560, label:"Bluza"     },
+      { id:"bluza",     x:360, y:580, label:"Bluza"     },
       { id:"skarpetki", x:750, y:700, label:"Skarpetki" },
       { id:"torba",     x:900, y:800, label:"Torba"     },
     ],
@@ -463,6 +463,7 @@ function restartGame() {
   resetCollected();
   updateInventoryHUD();
   buildRoom("sypialnia");
+  updateSprite()
   transitioning = false;
   gameRunning = true;
 }
