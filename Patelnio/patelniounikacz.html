@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel - Wspinaczka po Włosach</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+#game-wrapper {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+.scene {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.scene.active { display: flex; }
+
+/* ===== VN TEXTBOX ===== */
+.vn-textbox {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to bottom, rgba(10,10,30,0.45), rgba(10,10,30,0.55));
+  backdrop-filter: blur(3px);
+  border-top: 2px solid rgba(150,180,255,0.3);
+  padding: 20px 30px 25px;
+  min-height: 140px;
+  cursor: pointer;
+  user-select: none;
+}
+.vn-name {
+  color: #7ab8ff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(122,184,255,0.5);
+}
+.vn-text {
+  color: #e0e8f0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.vn-indicator {
+  position: absolute;
+  bottom: 8px; right: 20px;
+  color: #7ab8ff;
+  font-size: 14px;
+  animation: vnBlink 1s infinite;
+}
+@keyframes vnBlink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ===== INTRO SCENE ===== */
+#scene-intro {
+  background: #2a2430;
+}
+#intro-svg {
+  width: 100%; height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+}
+.star { animation: twinkle 2s infinite alternate; }
+@keyframes twinkle {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+.star:nth-child(odd) { animation-delay: 0.5s; animation-duration: 3s; }
+.star:nth-child(3n) { animation-delay: 1s; animation-duration: 2.5s; }
+
+#intro-visual {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform: translateY(0);
+  transition: transform 1.6s ease-in-out;
+}
+#intro-visual.panned {
+  transform: translateY(-180px);
+}
+
+/* Jeremi sprite: zoomed into the head, showing only top 33% but filling the whole window */
+#intro-jeremi {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 94px;
+  background-image: url('jeremi_patel.png');
+  background-repeat: no-repeat;
+  background-size: 330px 285px; /* top 33% zoomed to fill the window height */
+  background-position: top center;
+  opacity: 0;
+  transition: opacity 0.8s;
+  z-index: 2;
+}
+
+#intro-hair {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 0;
+  overflow: hidden;
+  transition: height 1.6s ease-in;
+  z-index: 0;
+}
+
+/* Gabriel prologue sprite (left frame of gabriel_patel.png), ~5x smaller */
+.gabriel-prologue {
+  width: 26px;
+  height: 52px;
+  background-image: url('gabriel_patel.png');
+  background-size: 300% 100%;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
+#intro-gabriel {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.5s;
+}
+#intro-gabriel.shouting {
+  animation: shout 0.4s ease-in-out 3;
+}
+@keyframes shout {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+
+/* ===== LEVEL SELECT ===== */
+#scene-level-select {
+  background: radial-gradient(ellipse at center, #1a1a3e 0%, #0a0a1e 100%);
+}
+.level-title {
+  color: #c0d0e8;
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(122,184,255,0.3);
+  text-align: center;
+}
+.level-instruction {
+  color: #aac0dd;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  padding: 14px 24px;
+  background: rgba(122,184,255,0.08);
+  border: 1px solid rgba(122,184,255,0.25);
+  border-radius: 12px;
+  text-align: center;
+  max-width: 560px;
+}
+.level-buttons {
+  display: flex;
+  gap: 30px;
+}
+.level-btn {
+  background: linear-gradient(135deg, rgba(40,40,80,0.8), rgba(20,20,50,0.9));
+  border: 2px solid rgba(122,184,255,0.3);
+  border-radius: 12px;
+  padding: 30px 25px;
+  width: 200px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+.level-btn:hover {
+  border-color: #7ab8ff;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(122,184,255,0.2);
+}
+.level-btn h3 {
+  color: #7ab8ff;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.level-btn p {
+  color: #8899bb;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.level-btn .emoji {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* ===== GAME SCENE ===== */
+#scene-game {
+  background: #1a1a2e;
+}
+#game-canvas {
+  display: block;
+}
+#game-hud {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 10;
+  pointer-events: none;
+}
+.hud-lives {
+  color: #ff4466;
+  font-size: 22px;
+  text-shadow: 0 0 8px rgba(255,68,102,0.5);
+}
+.hud-progress-container {
+  width: 18px;
+  height: 200px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.2);
+  overflow: hidden;
+}
+.hud-progress-bar {
+  width: 100%;
+  background: linear-gradient(to top, #44ff88, #22cc66);
+  border-radius: 9px;
+  transition: height 0.3s;
+  position: absolute;
+  bottom: 0;
+}
+.hud-label {
+  color: #aabbcc;
+  font-size: 11px;
+  text-align: center;
+}
+#game-message {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(0,0,0,0.8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 20;
+  text-align: center;
+}
+#game-message.show { opacity: 1; }
+
+/* ===== ENDING SCENE ===== */
+#scene-ending { background: #f5e6d0; }
+/* Final drawing placeholder - koniec_patel.png will be added later */
+#ending-art {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: #f5e6d0;
+  background-image: url('koniec_patel.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+/* ===== GAME OVER OVERLAY ===== */
+#game-over {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+#game-over.active { display: flex; }
+#game-over h2 { color: #ff4466; font-size: 36px; margin-bottom: 20px; }
+#game-over p { color: #ccc; margin-bottom: 30px; }
+.restart-btn {
+  background: linear-gradient(135deg, #4466aa, #334488);
+  border: 2px solid #7ab8ff;
+  color: white;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.restart-btn:hover { background: linear-gradient(135deg, #5577bb, #445599); transform: scale(1.05); }
+
+/* ===== INSTRUCTIONS OVERLAY ===== */
+#instructions {
+  position: absolute;
+  bottom: 150px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ===== SPEECH BUBBLES (Jeremi's mom) ===== */
+.speech-bubble {
+  position: absolute;
+  max-width: 240px;
+  padding: 12px 16px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 15;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  width: 0; height: 0;
+  border: 10px solid transparent;
+}
+#bubble-left {
+  top: 130px; left: 24px;
+}
+#bubble-left::after {
+  top: 100%;
+  left: 30px;
+  border-top-color: #fff;
+  border-bottom: 0;
+}
+#bubble-right {
+  top: 200px; right: 24px;
+}
+#bubble-right::after {
+  top: 100%;
+  right: 30px;
+  border-top-color: #fff;
+  border-bottom: 0;
+}
+.speech-bubble.show { opacity: 1; }
+
+/* ===== HIT FLASH ===== */
+@keyframes hitFlash {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(3) hue-rotate(60deg); }
+}
+.hit-flash { animation: hitFlash 0.3s ease; }
+</style>
+</head>
+<body>
+
+<div id="game-wrapper">
+  <!-- ===== INTRO VN SCENE ===== -->
+  <div id="scene-intro" class="scene active">
+    <div id="intro-visual">
+    <svg id="intro-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(255,250,220,0.3)"/>
+          <stop offset="100%" stop-color="rgba(255,250,220,0)"/>
+        </radialGradient>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#050520"/>
+          <stop offset="60%" stop-color="#0a0a3a"/>
+          <stop offset="100%" stop-color="#1a1a4e"/>
+        </linearGradient>
+      </defs>
+      <!-- Sky -->
+      <rect width="800" height="600" fill="url(#skyGrad)"/>
+      <!-- Stars -->
+      <g class="stars">
+        <circle class="star" cx="80" cy="50" r="1.5" fill="#fff"/>
+        <circle class="star" cx="150" cy="30" r="1" fill="#dde"/>
+        <circle class="star" cx="220" cy="80" r="1.8" fill="#fff"/>
+        <circle class="star" cx="310" cy="25" r="1.2" fill="#eef"/>
+        <circle class="star" cx="400" cy="60" r="1" fill="#fff"/>
+        <circle class="star" cx="480" cy="40" r="1.5" fill="#ddf"/>
+        <circle class="star" cx="550" cy="75" r="1.3" fill="#fff"/>
+        <circle class="star" cx="620" cy="20" r="1.8" fill="#eef"/>
+        <circle class="star" cx="700" cy="55" r="1" fill="#fff"/>
+        <circle class="star" cx="750" cy="90" r="1.4" fill="#ddf"/>
+        <circle class="star" cx="50" cy="120" r="1.1" fill="#fff"/>
+        <circle class="star" cx="260" cy="140" r="0.8" fill="#eef"/>
+        <circle class="star" cx="500" cy="130" r="1.6" fill="#fff"/>
+        <circle class="star" cx="680" cy="110" r="1.2" fill="#dde"/>
+        <circle class="star" cx="350" cy="160" r="1" fill="#fff"/>
+        <circle class="star" cx="120" cy="170" r="1.3" fill="#eef"/>
+        <circle class="star" cx="630" cy="155" r="0.9" fill="#fff"/>
+      </g>
+      <!-- Moon -->
+      <circle cx="650" cy="80" r="50" fill="url(#moonGlow)"/>
+      <circle cx="650" cy="80" r="25" fill="#ffeecc"/>
+      <circle cx="660" cy="75" r="22" fill="url(#skyGrad)"/>
+      <!-- Building brick wall (like the prologue) filling the screen -->
+      <rect x="0" y="0" width="800" height="600" fill="#2a2430"/>
+      <rect x="0" y="0" width="800" height="600" fill="#332c3b"/>
+      <!-- Brick pattern -->
+      <g stroke="#241f2d" stroke-width="1.2" fill="none">
+        <rect x="0" y="0" width="800" height="600"/>
+      </g>
+      <g id="intro-bricks">
+        <line x1="0" y1="24" x2="800" y2="24" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="52" x2="800" y2="52" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="82" x2="800" y2="82" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="114" x2="800" y2="114" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="148" x2="800" y2="148" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="184" x2="800" y2="184" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="222" x2="800" y2="222" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="262" x2="800" y2="262" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="304" x2="800" y2="304" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="348" x2="800" y2="348" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="394" x2="800" y2="394" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="442" x2="800" y2="442" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="492" x2="800" y2="492" stroke="#241f2d" stroke-width="2"/>
+        <line x1="0" y1="544" x2="800" y2="544" stroke="#241f2d" stroke-width="2"/>
+        <!-- vertical brick seams (offset per row) -->
+        <line x1="100" y1="0" x2="100" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="200" y1="0" x2="200" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="300" y1="0" x2="300" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="400" y1="0" x2="400" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="500" y1="0" x2="500" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="600" y1="0" x2="600" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="700" y1="0" x2="700" y2="24" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="50" y1="24" x2="50" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="150" y1="24" x2="150" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="250" y1="24" x2="250" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="350" y1="24" x2="350" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="450" y1="24" x2="450" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="550" y1="24" x2="550" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="650" y1="24" x2="650" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="750" y1="24" x2="750" y2="52" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="100" y1="52" x2="100" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="200" y1="52" x2="200" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="300" y1="52" x2="300" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="400" y1="52" x2="400" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="500" y1="52" x2="500" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="600" y1="52" x2="600" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+        <line x1="700" y1="52" x2="700" y2="82" stroke="#241f2d" stroke-width="1.5"/>
+      </g>
+      <!-- Dark upper-floor windows -->
+      <g fill="#1a1522">
+        <rect x="90" y="135" width="38" height="44" rx="2"/>
+        <rect x="180" y="135" width="38" height="44" rx="2"/>
+        <rect x="560" y="135" width="38" height="44" rx="2"/>
+        <rect x="660" y="135" width="38" height="44" rx="2"/>
+        <rect x="90" y="235" width="38" height="44" rx="2"/>
+        <rect x="250" y="235" width="38" height="44" rx="2"/>
+        <rect x="500" y="235" width="38" height="44" rx="2"/>
+        <rect x="660" y="235" width="38" height="44" rx="2"/>
+      </g>
+      <!-- Jeremi's lit window at the VERY TOP -->
+      <rect x="320" y="18" width="160" height="92" fill="#ffdd88" rx="3" opacity="0.95"/>
+      <rect x="320" y="18" width="160" height="92" fill="none" stroke="#ffcc44" stroke-width="3" rx="3"/>
+      <line x1="400" y1="18" x2="400" y2="110" stroke="#aa8833" stroke-width="3"/>
+      <line x1="320" y1="64" x2="480" y2="64" stroke="#aa8833" stroke-width="3"/>
+      <!-- Window glow -->
+      <rect x="306" y="10" width="188" height="108" fill="#ffdd66" opacity="0.12" rx="4"/>
+      <!-- Building door (large, so Gabriel looks tiny next to it) -->
+      <rect x="40" y="396" width="100" height="152" fill="#241f2d" rx="4"/>
+      <circle cx="127" cy="476" r="4" fill="#caa"/>
+      <rect x="40" y="430" width="100" height="4" fill="#2f2836"/>
+      <!-- Ground -->
+      <rect x="0" y="545" width="800" height="55" fill="#2a2430"/>
+      <rect x="0" y="543" width="800" height="4" fill="#3a3444"/>
+      <!-- Sidewalk -->
+      <rect x="0" y="540" width="800" height="5" fill="#3a3444" rx="1"/>
+      <!-- Streetlamp -->
+      <rect x="700" y="330" width="9" height="210" fill="#333"/>
+      <path d="M700,325 Q705,318 710,325 L722,340 L688,340 Z" fill="#444"/>
+      <circle cx="705" cy="345" r="6" fill="#ffdd88" opacity="0.85"/>
+      <ellipse cx="705" cy="365" rx="24" ry="8" fill="#ffdd88" opacity="0.12"/>
+    </svg>
+
+    <!-- Jeremi sprite (zoomed into the top of the image) at the top window -->
+    <div id="intro-jeremi" aria-label="Jeremi"></div>
+      <!-- Hair being lowered from behind Jeremi -->
+      <svg id="intro-hair" viewBox="0 0 220 600" preserveAspectRatio="none">
+        <g>
+          <path d="M30,0 Q26,90 32,180 Q26,280 33,380 Q30,500 32,600" stroke="#5a3520" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M50,0 Q46,95 52,185 Q46,285 53,385 Q50,505 52,600" stroke="#6b4228" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M70,0 Q66,85 72,175 Q66,275 73,375 Q70,498 72,600" stroke="#4e2d18" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M90,0 Q86,95 92,185 Q86,285 93,385 Q90,505 92,600" stroke="#5a3520" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M110,0 Q106,90 112,180 Q106,280 113,380 Q110,502 112,600" stroke="#6b4228" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M130,0 Q126,85 132,175 Q126,275 133,375 Q130,498 132,600" stroke="#4e2d18" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M150,0 Q146,95 152,185 Q146,285 153,385 Q150,505 152,600" stroke="#5a3520" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M170,0 Q166,90 172,180 Q166,280 173,380 Q170,502 172,600" stroke="#6b4228" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M190,0 Q186,85 192,175 Q186,275 193,375 Q190,498 192,600" stroke="#4e2d18" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+
+    <!-- Gabriel (prologue sprite, left frame of gabriel_patel.png) on the ground -->
+    <div id="intro-gabriel" class="gabriel-prologue"></div>
+    </div>
+
+    <!-- VN Textbox -->
+    <div class="vn-textbox" id="intro-textbox">
+      <div class="vn-name" id="intro-name"></div>
+      <div class="vn-text" id="intro-text"></div>
+      <div class="vn-indicator">▼ Kliknij aby kontynuować</div>
+    </div>
+  </div>
+
+  <!-- ===== LEVEL SELECT ===== -->
+  <div id="scene-level-select" class="scene">
+    <div class="level-title">Wybierz poziom trudności</div>
+    <div class="level-instruction">
+      Wespnij się po włosach Jeremiego,<br>
+      unikając przyborów kuchennych rzucanych przez mamę Jeremiego!
+    </div>
+    <div class="level-buttons">
+      <div class="level-btn" onclick="startGame('easy')">
+        <span class="emoji">😊</span>
+        <h3>Łatwy</h3>
+        <p>Wolne przedmioty, dużo miejsca na ruch. 3 życia.</p>
+      </div>
+      <div class="level-btn" onclick="startGame('medium')">
+        <span class="emoji">😅</span>
+        <h3>Średni</h3>
+        <p>Szybsze przedmioty, mniej miejsca. 2 życia.</p>
+      </div>
+      <div class="level-btn" onclick="startGame('hard')">
+        <span class="emoji">🔥</span>
+        <h3>Trudny</h3>
+        <p>Szybkie przedmioty, mało miejsca. 1 życie.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCENE ===== -->
+  <div id="scene-game" class="scene">
+    <canvas id="game-canvas" width="800" height="600"></canvas>
+    <div id="game-hud">
+      <div class="hud-lives" id="hud-lives">❤️❤️❤️</div>
+      <div style="position:relative">
+        <div class="hud-progress-container">
+          <div class="hud-progress-bar" id="hud-progress" style="height:0%"></div>
+        </div>
+        <div class="hud-label">Wysokość</div>
+      </div>
+    </div>
+    <div id="game-message"></div>
+    <div id="instructions">← → lub A/D aby się poruszać | Unikaj spadających przyborów kuchennych!</div>
+    <div id="bubble-left" class="speech-bubble"></div>
+    <div id="bubble-right" class="speech-bubble"></div>
+    <div id="game-over">
+      <h2>GAME OVER</h2>
+      <p>Gabriel został zniszczony przyborami kuchennymi!</p>
+      <button class="restart-btn" onclick="goToLevelSelect()">Spróbuj ponownie</button>
+    </div>
+  </div>
+
+  <!-- ===== ENDING SCENE ===== -->
+  <div id="scene-ending" class="scene">
+    <div id="ending-art" aria-label="Koniec"></div>
+    <div class="vn-textbox" id="ending-textbox">
+      <div class="vn-name" id="ending-name"></div>
+      <div class="vn-text" id="ending-text"></div>
+      <div class="vn-indicator">▼ Kliknij aby kontynuować</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SCENE MANAGEMENT =====
+const scenes = ['scene-intro', 'scene-level-select', 'scene-game', 'scene-ending'];
+function showScene(id) {
+  scenes.forEach(s => {
+    const el = document.getElementById(s);
+    el.classList.toggle('active', s === id);
+  });
+}
+
+// ===== INTRO VN DIALOGUE =====
+const introDialogue = [
+  { name: '', text: 'Pewnej nocy, Gabriel obudził się i zauważył, że stał się maleńki — nie większy od mrówki...', delay: 0 },
+  { name: 'Gabriel', text: 'Jeremi! JEREMI!', action: 'shout' },
+  { name: 'Gabriel', text: 'Jeremi, spuść swoje włosy! Muszę się wspiąć na górę!', action: 'shout' },
+  { name: 'Jeremi', text: 'Gabriel?! Co ty tu robisz na chodniku?!', action: 'jeremiAppear' },
+  { name: 'Gabriel', text: 'Nie pytaj! Po prostu spuść te włosy, błagam!', action: 'shout' },
+  { name: 'Jeremi', text: 'Dobra, dobra... zaraz je spuszczę!', action: 'lowerHair' },
+  { name: 'Gabriel', text: 'AAAAA! Twoja mama rzuca przyborami kuchennymi z drugiego okna!', action: 'shout' },
+];
+let introIndex = 0;
+const introName = document.getElementById('intro-name');
+const introText = document.getElementById('intro-text');
+const introGabriel = document.getElementById('intro-gabriel');
+const introJeremi = document.getElementById('intro-jeremi');
+const introHair = document.getElementById('intro-hair');
+const introContent = document.getElementById('intro-visual');
+let introLowered = false;
+
+function showIntroLine() {
+  if (introIndex >= introDialogue.length) {
+    showScene('scene-level-select');
+    return;
+  }
+  const line = introDialogue[introIndex];
+  introName.textContent = line.name;
+  introText.textContent = line.text;
+
+  if (line.action === 'shout') {
+    introGabriel.classList.add('shouting');
+    setTimeout(() => introGabriel.classList.remove('shouting'), 1200);
+  } else if (line.action === 'jeremiAppear') {
+    introJeremi.style.opacity = '1';
+  } else if (line.action === 'lowerHair') {
+    introJeremi.style.opacity = '1';
+    if (!introLowered) {
+      introLowered = true;
+      // First pan the frame up so the Jeremi sprite slides off the top.
+      introContent.classList.add('panned');
+      // Only once the sprite is no longer visible, lower the hair from the window.
+      setTimeout(() => {
+        introHair.style.height = '440px';
+      }, 1900);
+    }
+  }
+  introIndex++;
+}
+
+document.getElementById('intro-textbox').addEventListener('click', showIntroLine);
+showIntroLine();
+
+// ===== GAME =====
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let gameRunning = false;
+let gameAnimFrame = null;
+
+// Game state
+let player, camera, utensils, difficulty, lives, invincible, progress, gameOverFlag;
+
+// Sprites
+const gabrielSprite = new Image();
+gabrielSprite.src = 'gabriel_patel.png';
+const jeremiSprite = new Image();
+jeremiSprite.src = 'jeremi_patel.png';
+// gabriel_patel.png sheet = 3 equal frames: frame 0 = prologue, 1 & 2 = climbing
+const GABRIEL_FRAME_W = 1 / 3;
+
+const DIFFICULTY = {
+  // All difficulties climb ~45 seconds (4860px at 108 px/s); difficulty changes utensil density/speed
+  easy:   { climbHeight: 4860, spawnRate: 85, fallSpeed: 2.6, lives: 3, invincibleTime: 90  },
+  medium: { climbHeight: 4860, spawnRate: 50, fallSpeed: 4,   lives: 2, invincibleTime: 60  },
+  hard:   { climbHeight: 4860, spawnRate: 32, fallSpeed: 6,   lives: 1, invincibleTime: 45  },
+};
+
+// Utensil SVG templates (drawn on canvas)
+function drawPan(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#777';
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#888';
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.38, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#666';
+  ctx.fillRect(size * 0.4, -size * 0.08, size * 0.5, size * 0.16);
+  ctx.restore();
+}
+
+function drawKnife(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#ccc';
+  ctx.beginPath();
+  ctx.moveTo(0, -size * 0.5);
+  ctx.lineTo(size * 0.12, 0);
+  ctx.lineTo(0, size * 0.5);
+  ctx.lineTo(-size * 0.05, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#6b4228';
+  ctx.fillRect(-size * 0.08, size * 0.35, size * 0.16, size * 0.3);
+  ctx.restore();
+}
+
+function drawLadle(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#999';
+  ctx.beginPath();
+  ctx.ellipse(0, -size * 0.2, size * 0.25, size * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#aaa';
+  ctx.beginPath();
+  ctx.ellipse(0, -size * 0.2, size * 0.18, size * 0.22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#888';
+  ctx.fillRect(-size * 0.04, 0, size * 0.08, size * 0.5);
+  ctx.restore();
+}
+
+function drawFork(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#bbb';
+  for (let i = -1.5; i <= 1.5; i++) {
+    ctx.fillRect(i * size * 0.08 - size * 0.02, -size * 0.5, size * 0.04, size * 0.35);
+  }
+  ctx.fillRect(-size * 0.1, -size * 0.18, size * 0.2, size * 0.65);
+  ctx.fillStyle = '#6b4228';
+  ctx.fillRect(-size * 0.06, size * 0.3, size * 0.12, size * 0.25);
+  ctx.restore();
+}
+
+function drawPot(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#777';
+  ctx.beginPath();
+  ctx.roundRect(-size * 0.35, -size * 0.3, size * 0.7, size * 0.55, 4);
+  ctx.fill();
+  ctx.fillStyle = '#888';
+  ctx.fillRect(-size * 0.35, -size * 0.32, size * 0.7, size * 0.08);
+  ctx.fillStyle = '#666';
+  ctx.fillRect(-size * 0.42, -size * 0.15, size * 0.08, size * 0.15);
+  ctx.fillRect(size * 0.34, -size * 0.15, size * 0.08, size * 0.15);
+  ctx.restore();
+}
+
+function drawSpoon(ctx, x, y, size, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#aaa';
+  ctx.beginPath();
+  ctx.ellipse(0, -size * 0.25, size * 0.18, size * 0.22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#999';
+  ctx.beginPath();
+  ctx.ellipse(0, -size * 0.25, size * 0.12, size * 0.15, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#888';
+  ctx.fillRect(-size * 0.035, -size * 0.05, size * 0.07, size * 0.5);
+  ctx.restore();
+}
+
+const utensilDrawers = [drawPan, drawKnife, drawLadle, drawFork, drawPot, drawSpoon];
+const utensilNames = ['Patelnia', 'Nóż', 'Lż wazowa', 'Widelec', 'Garnek', 'Łyżka'];
+
+function startGame(diff) {
+  difficulty = DIFFICULTY[diff];
+  lives = difficulty.lives;
+  progress = 0;
+  invincible = 0;
+  gameOverFlag = false;
+  camera = { y: 0 };
+  utensils = [];
+  player = {
+    x: 400,
+    y: 0,
+    vy: 0,
+    vx: 0,
+    width: 20,
+    height: 30,
+    animFrame: 0,
+    animTimer: 0,
+    climbing: false,
+  };
+  document.getElementById('game-over').classList.remove('active');
+  updateLivesDisplay();
+  // Reset mom bubbles
+  bubbleTimer = 0;
+  bubbleLeft.classList.remove('show');
+  bubbleRight.classList.remove('show');
+  activeBubble = null;
+  showScene('scene-game');
+  gameRunning = true;
+  if (gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
+  lastSpawn = 0;
+  lastTime = 0;
+  gameLoop();
+}
+
+function updateLivesDisplay() {
+  document.getElementById('hud-lives').textContent = '❤️'.repeat(Math.max(0, lives));
+}
+
+function goToLevelSelect() {
+  gameRunning = false;
+  if (gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
+  showScene('scene-level-select');
+}
+
+// Input
+const keys = {};
+document.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+let lastSpawn = 0;
+let lastTime = 0;
+let particles = [];
+let screenShake = 0;
+
+function spawnUtensil(time) {
+  const cfg = difficulty;
+  if (time - lastSpawn < cfg.spawnRate * 16) return;
+  lastSpawn = time;
+  const type = Math.floor(Math.random() * utensilDrawers.length);
+  const hairLeft = 250;
+  const hairRight = 550;
+  const x = hairLeft + Math.random() * (hairRight - hairLeft);
+  const size = 25 + Math.random() * 15;
+  utensils.push({
+    x: x,
+    // Spawn just ABOVE the top edge of the screen so utensils fly in from the top
+    y: 600 + camera.y + 30 + Math.random() * 120,
+    speed: cfg.fallSpeed + Math.random() * 1.5,
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.08,
+    size: size,
+    type: type,
+    hit: false,
+  });
+}
+
+function drawPlayer() {
+  const p = player;
+  const sx = p.x;
+  const sy = 600 - p.y + camera.y - 45;
+
+  if (invincible > 0 && Math.floor(invincible / 3) % 2 === 0) return;
+
+  // Use the gabriel_patel.png climbing sprites (frames 1 & 2) once loaded
+  if (gabrielSprite.complete && gabrielSprite.naturalWidth > 0) {
+    const frameW = gabrielSprite.naturalWidth / 3;
+    const frameH = gabrielSprite.naturalHeight;
+    // Alternate between climbing frame 1 (middle) and frame 2 (right)
+    const frameIdx = Math.floor(p.animFrame * 0.5) % 2 === 0 ? 1 : 2;
+    const drawW = 60;
+    const drawH = drawW * (frameH / frameW);
+    ctx.save();
+    ctx.translate(sx, sy);
+    // Drop shadow for contrast against hair
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.drawImage(
+      gabrielSprite,
+      frameIdx * frameW, 0, frameW, frameH,
+      -drawW / 2, -drawH, drawW, drawH
+    );
+    ctx.restore();
+    return;
+  }
+
+  // Fallback vector drawing (if sprite not yet loaded)
+  const S = 1.7;
+
+  ctx.save();
+  ctx.translate(sx, sy);
+  ctx.scale(S, S);
+
+  const t = p.animFrame;
+
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
+
+  ctx.fillStyle = '#3366aa';
+  ctx.beginPath();
+  ctx.roundRect(-8, -4, 16, 15, 3);
+  ctx.fill();
+  ctx.strokeStyle = '#1a3a6a';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.strokeStyle = '#5588dd';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-8, 2);
+  ctx.lineTo(8, 2);
+  ctx.stroke();
+
+  ctx.fillStyle = '#f0c8a0';
+  ctx.beginPath();
+  ctx.arc(0, -11, 7.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#c89a70';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  ctx.fillStyle = '#2a1a0a';
+  ctx.beginPath();
+  ctx.ellipse(0, -15, 7.5, 4.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#222';
+  ctx.beginPath();
+  ctx.arc(-2.5, -11, 1.2, 0, Math.PI * 2);
+  ctx.arc(2.5, -11, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#d48';
+  ctx.beginPath();
+  ctx.arc(0, -8, 1.3, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.shadowColor = 'transparent';
+
+  ctx.strokeStyle = '#f0c8a0';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+
+  ctx.beginPath();
+  ctx.moveTo(-7, 0);
+  ctx.lineTo(-12, -6 + Math.sin(t * 0.15) * 6);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(7, 0);
+  ctx.lineTo(12, -6 + Math.cos(t * 0.15) * 6);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#223344';
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(-3, 11);
+  ctx.lineTo(-5, 19 + Math.sin(t * 0.15) * 4);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(3, 11);
+  ctx.lineTo(5, 19 + Math.cos(t * 0.15) * 4);
+  ctx.stroke();
+
+  ctx.fillStyle = '#553322';
+  ctx.beginPath();
+  ctx.ellipse(-5, 20 + Math.sin(t * 0.15) * 4, 3.5, 1.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(5, 20 + Math.cos(t * 0.15) * 4, 3.5, 1.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawHair() {
+  // Hair hangs as a tall curtain that fills the ENTIRE screen height,
+  // in a central band, with the brick wall visible on the sides.
+  const hairLeft = 250;
+  const hairRight = 550;
+  const centerX = 400;
+  const bandW = hairRight - hairLeft;
+
+  // Gentle sway based on time (slow, so it reads as wind, not motion)
+  const swayT = Date.now() * 0.00012;
+
+  const strandCount = 26;
+  const colors = ['#5a3520', '#6b4228', '#4e2d18', '#7a5030', '#5a3520', '#6b4228',
+                  '#4e2d18', '#7a5030', '#5a3520', '#6b4228', '#4e2d18', '#7a5030',
+                  '#5a3520', '#6b4228', '#4e2d18', '#7a5030', '#5a3520', '#6b4228',
+                  '#4e2d18', '#7a5030', '#5a3520', '#6b4228', '#4e2d18', '#7a5030',
+                  '#5a3520', '#6b4228'];
+
+  // Semi-solid brown curtain only within the band, so wall stays visible on sides
+  const curtain = ctx.createLinearGradient(hairLeft, 0, hairRight, 0);
+  curtain.addColorStop(0, 'rgba(74,48,24,0.0)');
+  curtain.addColorStop(0.5, 'rgba(74,48,24,0.45)');
+  curtain.addColorStop(1, 'rgba(74,48,24,0.0)');
+  ctx.fillStyle = curtain;
+  ctx.fillRect(hairLeft - 10, 0, bandW + 20, 600);
+
+  // Windowsill (parapet) at the very top - appears as Gabriel reaches the top.
+  // Only the sill is visible, so it's clear where the hair comes from.
+  const sillWorldY = difficulty.climbHeight + 85;
+  const sillScreenY = 600 - sillWorldY + camera.y;
+  const sillVisible = sillScreenY > -60 && sillScreenY < 320;
+  // Hair strands always start ABOVE the top of the screen, so their source
+  // is never visible (they appear to come from behind the sill).
+  const topY = -20;
+
+  // Draw strands spanning the full height (from topY down to the bottom)
+  for (let s = 0; s < strandCount; s++) {
+    const baseX = hairLeft + (s / (strandCount - 1)) * bandW;
+    const width = 3.5 + (s % 4) * 1.3;
+
+    ctx.strokeStyle = colors[s];
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+
+    ctx.moveTo(baseX + Math.sin(s * 2) * 8, topY);
+
+    const n = 24;
+    for (let i = 1; i <= n; i++) {
+      const f = i / n;
+      const x = baseX + Math.sin(f * 3 + s * 1.3 + swayT * 40) * (10 + s % 3 * 4) + Math.sin(f * 1.7 + s) * 8;
+      const y = topY + f * (620 - topY);
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Parapet (windowsill) - a thin ledge at the very top, hair comes from behind it
+  if (sillVisible) {
+    // Brick sill block across the full width (thin - only its edge is visible)
+    ctx.fillStyle = '#2a2430';
+    ctx.fillRect(0, sillScreenY - 16, 800, 16);
+    // Brick seams
+    ctx.strokeStyle = '#241f2d';
+    ctx.lineWidth = 1.5;
+    for (let bx = -26 + (Math.floor(sillWorldY / 26) % 2) * 26; bx < 800; bx += 52) {
+      ctx.beginPath();
+      ctx.moveTo(bx, sillScreenY - 16);
+      ctx.lineTo(bx, sillScreenY);
+      ctx.stroke();
+    }
+    // Sill top lip (highlight)
+    ctx.fillStyle = '#3a3444';
+    ctx.fillRect(0, sillScreenY - 16, 800, 3);
+    // Sill edge/overhang
+    ctx.fillStyle = '#4a4254';
+    ctx.fillRect(0, sillScreenY - 3, 800, 3);
+  }
+}
+
+function drawWall() {
+  const viewTop = camera.y + 600;
+  const viewBot = camera.y;
+
+  ctx.fillStyle = '#2a2430';
+  ctx.fillRect(0, 0, 800, 600);
+
+  // Brick rows
+  const brickH = 26;
+  const brickW = 52;
+  ctx.strokeStyle = '#241f2d';
+  ctx.lineWidth = 1.5;
+
+  const startBrickY = Math.floor(viewBot / brickH);
+  const endBrickY = Math.ceil(viewTop / brickH);
+
+  for (let row = startBrickY; row <= endBrickY; row++) {
+    const screenY = 600 - row * brickH + camera.y;
+    const offset = (row % 2) * (brickW * 0.5);
+    // horizontal mortar line
+    ctx.beginPath();
+    ctx.moveTo(0, screenY);
+    ctx.lineTo(800, screenY);
+    ctx.stroke();
+    for (let col = -2; col < 18; col++) {
+      const bx = col * brickW + offset;
+      // vertical mortar line
+      ctx.beginPath();
+      ctx.moveTo(bx, screenY - brickH);
+      ctx.lineTo(bx, screenY);
+      ctx.stroke();
+    }
+  }
+
+  // A few dark windows on the wall (for atmosphere)
+  for (let wy = 0; wy < difficulty.climbHeight; wy += 260) {
+    const screenY = 600 - wy + camera.y;
+    if (screenY < -100 || screenY > 650) continue;
+
+    // Left window
+    ctx.fillStyle = '#1a1522';
+    ctx.beginPath();
+    ctx.roundRect(70, screenY, 44, 54, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#3a3444';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Right window
+    ctx.fillStyle = '#1a1522';
+    ctx.beginPath();
+    ctx.roundRect(686, screenY, 44, 54, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#3a3444';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+}
+
+function drawUtensils() {
+  for (const u of utensils) {
+    const sy = 600 - u.y + camera.y;
+    if (sy < -50 || sy > 650) continue;
+    utensilDrawers[u.type](ctx, u.x, sy, u.size, u.rot);
+  }
+}
+
+function drawProgress() {
+  const pct = Math.min(100, (player.y / difficulty.climbHeight) * 100);
+  document.getElementById('hud-progress').style.height = pct + '%';
+}
+
+// ===== MOM'S SPEECH BUBBLES =====
+const momPhrases = [
+  'A pójdziesz ty mi stąd!',
+  'Wynoś mi się z tego okna!',
+  'Co ty tam robisz?!',
+  'Złaź mi natychmiast!',
+  'Jeszcze się tu kręcisz?!',
+  'Dam ci popalić!',
+  'Łap patelnię!',
+  'Już ja ci pokażę!',
+  'Precz z mojego parapetu!',
+];
+const bubbleLeft = document.getElementById('bubble-left');
+const bubbleRight = document.getElementById('bubble-right');
+let bubbleTimer = 0;
+let activeBubble = null;
+
+function showMomBubble() {
+  const phrase = momPhrases[Math.floor(Math.random() * momPhrases.length)];
+  const el = Math.random() < 0.5 ? bubbleLeft : bubbleRight;
+  el.textContent = phrase;
+  el.classList.add('show');
+  if (activeBubble && activeBubble !== el) activeBubble.classList.remove('show');
+  activeBubble = el;
+  setTimeout(() => { el.classList.remove('show'); if (activeBubble === el) activeBubble = null; }, 2400);
+}
+
+function gameLoop(time) {
+  if (!gameRunning) return;
+  if (gameOverFlag) return;
+
+  const p = player;
+
+  // Frame delta for time-based climb (target ~90s climb)
+  const now = time && time > 0 ? time : (performance ? performance.now() : Date.now());
+  if (lastTime <= 0) lastTime = now;
+  const dt = Math.min(50, now - lastTime);
+  lastTime = now;
+  const CLIMB_SPEED = 108; // px per second (~90s climb over 9700px)
+
+  // Input
+  const speed = 4.5;
+  if (keys['arrowleft'] || keys['a']) {
+    p.vx = -speed;
+    p.climbing = true;
+  } else if (keys['arrowright'] || keys['d']) {
+    p.vx = speed;
+    p.climbing = true;
+  } else {
+    p.vx *= 0.85;
+    p.climbing = Math.abs(p.vx) > 0.3;
+  }
+
+  // Auto-climb (time-based)
+  p.y += CLIMB_SPEED * (dt / 1000);
+
+  // Move horizontally
+  p.x += p.vx;
+  // Keep Gabriel on the hair - cannot leave it to the sides
+  p.x = Math.max(250, Math.min(550, p.x));
+
+  // Animation - always running while climbing (not only when moving)
+  p.animTimer++;
+  if (p.animTimer > 3) {
+    p.animTimer = 0;
+    p.animFrame++;
+  }
+
+  // Camera follows - keep player around y=470 on screen (visible throughout).
+  // Near the top the camera stops, so Gabriel climbs all the way to the top of the screen.
+  const camCap = Math.max(0, difficulty.climbHeight - 500);
+  const targetCamY = Math.max(0, Math.min(p.y - 85, camCap));
+  camera.y += (targetCamY - camera.y) * 0.12;
+  if (camera.y < 0) camera.y = 0;
+
+  // Screen shake
+  if (screenShake > 0) screenShake *= 0.9;
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const pt = particles[i];
+    pt.x += pt.vx;
+    pt.y += pt.vy;
+    pt.vy += 0.3;
+    pt.life--;
+    if (pt.life <= 0) particles.splice(i, 1);
+  }
+
+  // Invincibility
+  if (invincible > 0) invincible--;
+
+  // Mom speech bubbles (periodic, on both sides)
+  bubbleTimer++;
+  if (bubbleTimer > 270) {
+    bubbleTimer = 0;
+    showMomBubble();
+  }
+
+  // Spawn utensils
+  spawnUtensil(time || 0);
+
+  // Update utensils
+  for (let i = utensils.length - 1; i >= 0; i--) {
+    const u = utensils[i];
+    u.y -= u.speed;
+    u.rot += u.rotSpeed;
+
+    // Collision with player (world-space)
+    if (!u.hit && invincible <= 0) {
+      const playerWorldCenterY = p.y + 45;
+      const dx = Math.abs(u.x - p.x);
+      const dy = Math.abs(u.y - playerWorldCenterY);
+
+      if (dx < (u.size * 0.32 + p.width * 0.5) && dy < (u.size * 0.32 + p.height * 0.5)) {
+        u.hit = true;
+        lives--;
+        invincible = difficulty.invincibleTime;
+        updateLivesDisplay();
+
+        // Knock back
+        p.y = Math.max(0, p.y - 80);
+        screenShake = 12;
+
+        // Spawn hit particles
+        for (let k = 0; k < 12; k++) {
+          particles.push({
+            x: p.x,
+            y: p.y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6 - 2,
+            life: 30 + Math.random() * 20,
+            maxLife: 50,
+            color: ['#ff4464', '#ffaa33', '#ff6644', '#ffffff'][Math.floor(Math.random() * 4)],
+            size: 2 + Math.random() * 3,
+          });
+        }
+
+        // Flash effect
+        canvas.classList.add('hit-flash');
+        setTimeout(() => canvas.classList.remove('hit-flash'), 300);
+
+        if (lives <= 0) {
+          gameOverFlag = true;
+          document.getElementById('game-over').classList.add('active');
+          return;
+        }
+      }
+    }
+
+    // Remove off-screen (fallen below the visible area)
+    if (u.y < camera.y - 60) {
+      utensils.splice(i, 1);
+    }
+  }
+
+  // Check win
+  if (p.y >= difficulty.climbHeight) {
+    gameRunning = false;
+    showMessage('Gabriel dotarł na parapet!', 2000);
+    setTimeout(() => { startEnding(); }, 2500);
+    return;
+  }
+
+  // Draw
+  const shakeX = (Math.random() - 0.5) * screenShake;
+  const shakeY = (Math.random() - 0.5) * screenShake;
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
+  drawWall();
+  drawHair();
+  drawUtensils();
+
+  // Draw particles
+  for (const pt of particles) {
+    const sy = 600 - pt.y + camera.y;
+    ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
+    ctx.fillStyle = pt.color;
+    ctx.beginPath();
+    ctx.arc(pt.x, sy, pt.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  drawPlayer();
+  ctx.restore();
+  drawProgress();
+
+  gameAnimFrame = requestAnimationFrame(gameLoop);
+}
+
+function showMessage(text, duration) {
+  const el = document.getElementById('game-message');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ===== ENDING VN =====
+const endingDialogue = [
+  { name: 'Gabriel', text: '...' },
+  { name: 'Gabriel', text: 'Ale pojebany sen...' },
+  { name: '', text: 'KONIEC' },
+];
+let endingIndex = 0;
+let endingStarted = false;
+
+function startEnding() {
+  endingIndex = 0;
+  endingStarted = true;
+  showScene('scene-ending');
+  showEndingLine();
+}
+
+function showEndingLine() {
+  if (endingIndex >= endingDialogue.length) {
+    setTimeout(() => {
+      goToLevelSelect();
+      endingStarted = false;
+    }, 3000);
+    return;
+  }
+  const line = endingDialogue[endingIndex];
+  document.getElementById('ending-name').textContent = line.name;
+  document.getElementById('ending-text').textContent = line.text;
+  endingIndex++;
+}
+
+document.getElementById('ending-textbox').addEventListener('click', () => {
+  if (endingStarted) showEndingLine();
+});
+
+// roundRect polyfill for older browsers
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = [r, r, r, r];
+    this.moveTo(x + r[0], y);
+    this.lineTo(x + w - r[1], y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+    this.lineTo(x + w, y + h - r[2]);
+    this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+    this.lineTo(x + r[3], y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+    this.lineTo(x, y + r[0]);
+    this.quadraticCurveTo(x, y, x + r[0], y);
+    this.closePath();
+  };
+}
+</script>
+</body>
+</html>
