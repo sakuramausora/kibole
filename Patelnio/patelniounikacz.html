@@ -221,6 +221,43 @@ body {
 #game-canvas {
   display: block;
 }
+
+/* Touch controls (mobile) */
+#touch-controls {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 20;
+  pointer-events: none;
+}
+.touch-btn {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.55);
+  background: rgba(20,20,40,0.45);
+  color: #fff;
+  font-size: 40px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  touch-action: none;
+}
+.touch-btn:active {
+  background: rgba(120,180,255,0.5);
+}
+@media (hover: hover) and (pointer: fine) {
+  #touch-controls { display: none; }
+}
 #game-hud {
   position: absolute;
   top: 10px;
@@ -276,7 +313,6 @@ body {
 
 /* ===== ENDING SCENE ===== */
 #scene-ending { background: #f5e6d0; }
-/* Final drawing placeholder - koniec_patel.png will be added later */
 #ending-art {
   position: absolute;
   top: 0; left: 0;
@@ -570,13 +606,17 @@ body {
       </div>
     </div>
     <div id="game-message"></div>
-    <div id="instructions">← → lub A/D aby się poruszać | Unikaj spadających przyborów kuchennych!</div>
+    <div id="instructions">Unikaj spadających przyborów kuchennych! Poruszanie: ← → (klawiatura) lub dotknij przycisków na ekranie</div>
     <div id="bubble-left" class="speech-bubble"></div>
     <div id="bubble-right" class="speech-bubble"></div>
     <div id="game-over">
       <h2>GAME OVER</h2>
       <p>Gabriel został zniszczony przyborami kuchennymi!</p>
       <button class="restart-btn" onclick="goToLevelSelect()">Spróbuj ponownie</button>
+    </div>
+    <div id="touch-controls">
+      <div class="touch-btn" id="btn-left" aria-label="Lewo">◀</div>
+      <div class="touch-btn" id="btn-right" aria-label="Prawo">▶</div>
     </div>
   </div>
 
@@ -826,6 +866,35 @@ function goToLevelSelect() {
 const keys = {};
 document.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
 document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+// Touch controls - feed the same `keys` input used by the game loop
+function bindTouchButton(id, key) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  const on = (e) => { e.preventDefault(); keys[key] = true; };
+  const off = (e) => { e.preventDefault(); keys[key] = false; };
+  btn.addEventListener('touchstart', on, { passive: false });
+  btn.addEventListener('touchend', off, { passive: false });
+  btn.addEventListener('touchcancel', off, { passive: false });
+  btn.addEventListener('mousedown', on);
+  btn.addEventListener('mouseup', off);
+  btn.addEventListener('mouseleave', off);
+}
+bindTouchButton('btn-left', 'arrowleft');
+bindTouchButton('btn-right', 'arrowright');
+
+// Responsive scaling - fit the fixed 800x600 game to the phone screen
+function fitGame() {
+  const wrapper = document.getElementById('game-wrapper');
+  if (!wrapper) return;
+  const s = Math.min(1, window.innerWidth / 800, window.innerHeight / 600);
+  wrapper.style.transformOrigin = 'top left';
+  wrapper.style.transform = `scale(${s})`;
+  wrapper.style.width = (800 * s) + 'px';
+  wrapper.style.height = (600 * s) + 'px';
+}
+window.addEventListener('resize', fitGame);
+fitGame();
 
 let lastSpawn = 0;
 let lastTime = 0;
