@@ -220,7 +220,12 @@
 
   document.getElementById('btnAgeNo').addEventListener('click', function () {
   alert('Musisz mieć ukończone 18 lat, aby grać.');
-  window.history.back();
+  if (window.opener) {
+    window.opener.showScreen('games', null);
+    window.close();
+  } else {
+    window.history.back();
+  }
 });
 
   document.getElementById('btnQuit').addEventListener('click', function () {
