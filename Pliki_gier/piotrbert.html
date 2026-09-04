@@ -109,8 +109,8 @@
     <div id="menu" class="overlay" style="display:none;">
       <h2>Wybierz scenę</h2>
       <button class="sceneBtn primary" data-scene="s1">Scena 1</button>
-      <button class="sceneBtn" data-scene="s2" disabled title="Wkrótce">Scena 2</button>
-      <button class="sceneBtn" data-scene="s3" disabled title="Wkrótce">Scena 3</button>
+      /*<button class="sceneBtn" data-scene="s2" disabled title="Wkrótce">Scena 2</button>
+      <button class="sceneBtn" data-scene="s3" disabled title="Wkrótce">Scena 3</button>*/
       <button id="btnQuit" style="margin-top:14px; min-width:120px;">Wróć</button>
     </div>
     <div id="dialog" style="display:none;">
@@ -141,11 +141,11 @@
       { name: 'Robert', text: 'Piotr, musisz wejść głębiej.' },
       { name: 'Piotr', text: 'Nie mogę.' },
       { name: 'Robert', text: 'Możesz. Jeszcze kawałek.' },
-      { name: 'Piotr', text: 'Robert, tu jest zdecydowanie za ciasno.' },
+      { name: 'Piotr', text: 'Robert, tu jest zdecydowanie za ciasno...' },
       { name: 'Robert', text: 'Spróbuj może... o, tak...' },
       { name: 'Piotr', text: 'Dobra… mam!' },
       { img: '1.png', name: 'Piotr', text: 'Dobra, to jest ostatni raz co się u ciebie bawiłem w hydraulika.' },
-      { name: '', text: '— KONIEC SCENY 1 —' }
+      { name: '', text: '— KONIEC —' }
     ]
   };
   // Przykładowe puste sceny do dodania w przyszłości.
@@ -220,8 +220,9 @@
   });
 
   document.getElementById('btnAgeNo').addEventListener('click', function () {
-    showScreen('games', this);
-  });
+  alert('Musisz mieć ukończone 18 lat, aby grać.');
+  window.location.href = 'games.html';
+});
 
   document.getElementById('btnQuit').addEventListener('click', function () {
     menu.style.display = 'none';
