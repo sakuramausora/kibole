@@ -275,11 +275,6 @@
   }
 });
 
-  document.getElementById('btnQuit').addEventListener('click', function () {
-    menu.style.display = 'none';
-    document.getElementById('ageCheck').style.display = 'flex';
-  });
-
   document.querySelectorAll('.sceneBtn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (btn.disabled) return;
