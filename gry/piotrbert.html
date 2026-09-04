@@ -108,8 +108,7 @@
     <div id="menu" class="overlay" style="display:none;">
       <h2>Wybierz scenę</h2>
       <button class="sceneBtn primary" data-scene="s1">Scena 1</button>
-      <!--<button class="sceneBtn" data-scene="s2" disabled title="Wkrótce">Scena 2</button>
-      <button class="sceneBtn" data-scene="s3" disabled title="Wkrótce">Scena 3</button>-->
+      <button class="sceneBtn" data-scene="s2">Scena 2</button>
       <button id="btnQuit" style="margin-top:14px; min-width:120px;">Wróć</button>
     </div>
     <div id="dialog" style="display:none;">
@@ -145,10 +144,18 @@
       { name: 'Piotr', text: 'Dobra… mam!' },
       { img: '1.png', name: 'Piotr', text: 'Dobra, to jest ostatni raz co się u ciebie bawiłem w hydraulika.' },
       { name: '', text: '— KONIEC —' }
+    ],
+    s2: [
+      { black: true },
+      { name: 'Robert', text: 'Hy... hy...' },
+      { name: 'Piotr', text: 'Już masz dość?' },
+      { name: 'Robert', text: 'Wymęczyłeś mnie strasznie.' },
+      { name: 'Piotr', text: 'Hehe, mięczak.' },
+      { name: 'Robert', text: 'Jeszcze mnie dupa boli... Nie wiem, jak będę jutro siedział.' },
+      { img: '2.jpg', name: 'Piotr', text: 'Mówiłem, kup sobie lepsze siodełko.' },
+      { name: '', text: '— KONIEC —' }
     ]
   };
-  // Przykładowe puste sceny do dodania w przyszłości.
-  // SCENES.s2 = ... ; SCENES.s3 = ...
 
   function showMenu() {
     current = null;
