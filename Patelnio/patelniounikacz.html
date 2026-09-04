@@ -643,7 +643,7 @@ function showScene(id) {
 
 // ===== INTRO VN DIALOGUE =====
 const introDialogue = [
-  { name: '', text: 'Pewnej nocy, Gabriel obudził się i zauważył, że stał się maleńki — nie większy od mrówki...', delay: 0 },
+  { name: '', text: 'Pewnej nocy, Gabriel obudził się i zauważył, że stał się maleńki — niewiele większy od mrówki...', delay: 0 },
   { name: 'Gabriel', text: 'Jeremi! JEREMI!', action: 'shout' },
   { name: 'Gabriel', text: 'Jeremi, spuść swoje włosy! Muszę się wspiąć na górę!', action: 'shout' },
   { name: 'Jeremi', text: 'Gabriel?! Co ty tu robisz na chodniku?!', action: 'jeremiAppear' },
@@ -883,15 +883,21 @@ function bindTouchButton(id, key) {
 bindTouchButton('btn-left', 'arrowleft');
 bindTouchButton('btn-right', 'arrowright');
 
-// Responsive scaling - fit the fixed 800x600 game to the phone screen
+// Responsive scaling - fill the phone screen on touch devices, fit on desktop
 function fitGame() {
   const wrapper = document.getElementById('game-wrapper');
   if (!wrapper) return;
-  const s = Math.min(1, window.innerWidth / 800, window.innerHeight / 600);
-  wrapper.style.transformOrigin = 'top left';
+  const W = 800, H = 600;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const isTouch = !!(window.matchMedia &&
+    (window.matchMedia('(hover: none)').matches || window.matchMedia('(pointer: coarse)').matches));
+  // On touch: fill the whole screen (cover, centered) so the game is big.
+  // On desktop: fit the whole game inside the window without cropping.
+  const s = isTouch ? Math.max(vw / W, vh / H) : Math.min(1, vw / W, vh / H);
+  wrapper.style.width = '';
+  wrapper.style.height = '';
+  wrapper.style.transformOrigin = 'center center';
   wrapper.style.transform = `scale(${s})`;
-  wrapper.style.width = (800 * s) + 'px';
-  wrapper.style.height = (600 * s) + 'px';
 }
 window.addEventListener('resize', fitGame);
 fitGame();
