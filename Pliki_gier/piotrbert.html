@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VN — Hydraulik</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #111;
+    color: #eee;
+    font-family: "Segoe UI", Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  #game {
+    width: 100%;
+    max-width: 920px;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.8);
+    position: relative;
+  }
+  #stage {
+    width: 100%;
+    height: 540px;
+    background: #000;
+    position: relative;
+  }
+  #stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #030303;
+    text-align: center;
+    padding: 30px;
+  }
+  #startScreen h1 { font-size: 32px; margin-bottom: 10px; }
+  #startScreen p { color: #aaa; }
+  #ageCheck h2 { font-size: 26px; margin-bottom: 6px; }
+  #ageCheck p { color: #aaa; font-size: 14px; margin-bottom: 12px; }
+  #ageCheck .ageBtns { display: flex; gap: 14px; }
+  #ageCheck .btn-no { background: #5a2222; border-color: #8a3333; }
+  #ageCheck .btn-no:hover { background: #6a2a2a; }
+  button {
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 12px 22px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 240px;
+    transition: background .15s, transform .1s;
+  }
+  button:hover { background: #333; }
+  button:active { transform: translateY(1px); }
+  button.primary { background: #7a4a2b; border-color: #a06a3a; }
+  button.primary:hover { background: #8f5833; }
+  #menu h2 { font-size: 26px; margin-bottom: 8px; }
+  #dialog {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,.55);
+    border-top: 2px solid #333;
+    padding: 18px 26px;
+    min-height: 110px;
+    cursor: pointer;
+    user-select: none;
+  }
+  #name { color: #e8a45a; font-weight: bold; margin-bottom: 4px; font-size: 18px; }
+  #text { font-size: 18px; line-height: 1.5; color: #eee; }
+  #hint { position: absolute; right: 26px; bottom: 10px; font-size: 12px; color: #777; }
+  #backToMenu {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 12px;
+    padding: 6px 10px;
+    min-width: 0;
+    background: rgba(0,0,0,.5);
+  }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="stage">
+    <img id="sceneImg" src="1.png" alt="scena">
+    <div id="ageCheck" class="overlay">
+      <h2>Weryfikacja wieku</h2>
+      <p>Musisz mieć ukończone 18 lat, aby wejść do gry.</p>
+      <div class="ageBtns">
+        <button id="btnAgeYes" class="primary">Mam 18+</button>
+        <button id="btnAgeNo" class="btn-no">Nie mam 18 lat</button>
+      </div>
+    </div>
+    <div id="menu" class="overlay" style="display:none;">
+      <h2>Wybierz scenę</h2>
+      <button class="sceneBtn primary" data-scene="s1">Scena 1</button>
+      <button class="sceneBtn" data-scene="s2" disabled title="Wkrótce">Scena 2</button>
+      <button class="sceneBtn" data-scene="s3" disabled title="Wkrótce">Scena 3</button>
+      <button id="btnQuit" style="margin-top:14px; min-width:120px;">Wróć</button>
+    </div>
+    <div id="dialog" style="display:none;">
+      <div id="name"></div>
+      <div id="text"></div>
+      <div id="hint">▼ kliknij, aby kontynuować</div>
+    </div>
+    <button id="backToMenu" style="display:none;">← Menu</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const menu = document.getElementById('menu');
+  const dialog = document.getElementById('dialog');
+  const nameEl = document.getElementById('name');
+  const textEl = document.getElementById('text');
+  const imgEl = document.getElementById('sceneImg');
+  const backBtn = document.getElementById('backToMenu');
+
+  let current = null;
+  let index = 0;
+  let sceneEnded = false;
+
+  const SCENES = {
+    s1: [
+      { black: true },
+      { name: 'Robert', text: 'Piotr, musisz wejść głębiej.' },
+      { name: 'Piotr', text: 'Nie mogę.' },
+      { name: 'Robert', text: 'Możesz. Jeszcze kawałek.' },
+      { name: 'Piotr', text: 'Robert, tu jest zdecydowanie za ciasno.' },
+      { name: 'Robert', text: 'Spróbuj może... o, tak...' },
+      { name: 'Piotr', text: 'Dobra… mam!' },
+      { img: '1.png', name: 'Piotr', text: 'Dobra, to jest ostatni raz co się u ciebie bawiłem w hydraulika.' },
+      { name: '', text: '— KONIEC SCENY 1 —' }
+    ]
+  };
+  // Przykładowe puste sceny do dodania w przyszłości.
+  // SCENES.s2 = ... ; SCENES.s3 = ...
+
+  function showMenu() {
+    current = null;
+    menu.style.display = 'flex';
+    dialog.style.display = 'none';
+    imgEl.style.display = 'none';
+    backBtn.style.display = 'none';
+  }
+
+  function startScene(key) {
+    current = SCENES[key];
+    if (!current) return;
+    index = 0;
+    sceneEnded = false;
+    menu.style.display = 'none';
+    imgEl.style.display = 'none';
+    step();
+  }
+
+  function step() {
+    if (index >= current.length) {
+      dialog.style.display = 'none';
+      backBtn.style.display = 'block';
+      return;
+    }
+    const entry = current[index];
+    imgEl.style.display = 'none';
+    if (entry.black) {
+      nameEl.textContent = '';
+      textEl.textContent = '';
+      dialog.style.display = 'none';
+      backBtn.style.display = 'none';
+      index++;
+      step();
+      return;
+    }
+    if (entry.img) {
+      imgEl.src = entry.img;
+      imgEl.style.display = 'block';
+      nameEl.textContent = entry.name;
+      textEl.textContent = entry.text;
+      dialog.style.display = 'flex';
+      dialog.style.flexDirection = 'column';
+      backBtn.style.display = 'none';
+      index++;
+      return;
+    }
+    nameEl.textContent = entry.name;
+    textEl.textContent = entry.text;
+    dialog.style.display = 'flex';
+    dialog.style.flexDirection = 'column';
+    backBtn.style.display = 'none';
+  }
+
+  dialog.addEventListener('click', function () {
+    if (!current) return;
+    index++;
+    step();
+  });
+
+  backBtn.addEventListener('click', function () {
+    showMenu();
+  });
+
+  document.getElementById('btnAgeYes').addEventListener('click', function () {
+    document.getElementById('ageCheck').style.display = 'none';
+    showMenu();
+  });
+
+  document.getElementById('btnAgeNo').addEventListener('click', function () {
+    showScreen('games', this);
+  });
+
+  document.getElementById('btnQuit').addEventListener('click', function () {
+    menu.style.display = 'none';
+    document.getElementById('ageCheck').style.display = 'flex';
+  });
+
+  document.querySelectorAll('.sceneBtn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.disabled) return;
+      startScene(btn.dataset.scene);
+    });
+  });
+
+  // ageCheck widoczne domyślnie w HTML
+})();
+</script>
+</body>
+</html>
