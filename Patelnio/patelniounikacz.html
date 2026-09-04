@@ -883,17 +883,14 @@ function bindTouchButton(id, key) {
 bindTouchButton('btn-left', 'arrowleft');
 bindTouchButton('btn-right', 'arrowright');
 
-// Responsive scaling - fill the phone screen on touch devices, fit on desktop
+// Responsive scaling - keep the WHOLE 800x600 game visible, scaled proportionally
+// to fit the current screen width/height (no cropping), centered.
 function fitGame() {
   const wrapper = document.getElementById('game-wrapper');
   if (!wrapper) return;
   const W = 800, H = 600;
   const vw = window.innerWidth, vh = window.innerHeight;
-  const isTouch = !!(window.matchMedia &&
-    (window.matchMedia('(hover: none)').matches || window.matchMedia('(pointer: coarse)').matches));
-  // On touch: fill the whole screen (cover, centered) so the game is big.
-  // On desktop: fit the whole game inside the window without cropping.
-  const s = isTouch ? Math.max(vw / W, vh / H) : Math.min(1, vw / W, vh / H);
+  const s = Math.min(vw / W, vh / H);
   wrapper.style.width = '';
   wrapper.style.height = '';
   wrapper.style.transformOrigin = 'center center';
